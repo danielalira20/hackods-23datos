@@ -1,0 +1,8 @@
+tipo_dia,dia_semana,afluencia,dia_nombre,afluencia_promedio
+Laboral (Lun-Vie),0,18364.30282284535,Lunes,18364
+Laboral (Lun-Vie),1,18632.361816580134,Martes,18632
+Laboral (Lun-Vie),2,18655.737337912138,Miércoles,18656
+Laboral (Lun-Vie),3,18565.143384765368,Jueves,18565
+Laboral (Lun-Vie),4,18895.459292963336,Viernes,18895
+Fin de semana,5,15725.38109607527,Sábado,15725
+Fin de semana,6,10792.53851639175,Domingo,10793
