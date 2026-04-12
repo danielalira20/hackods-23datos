@@ -1,6 +1,10 @@
 project:
   type: website
 
+jupyter:
+  python:
+    python: "C:\\Users\\magui\\Downloads\\hackODS\\.venv\\Scripts\\python.exe"
+
 website:
   title: "dashboard"
   navbar:
@@ -16,6 +20,3 @@ format:
       - brand
     css: styles.css
     toc: true
-
-
-

@@ -2,4 +2,7 @@
 title: "Development Indicators by Continent"
 author: "Gapminder Analytics Group"
 format: dashboard
---- 
+theme: cosmo
+ 
+---
+hola gente
