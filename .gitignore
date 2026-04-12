@@ -8,6 +8,7 @@ venv/
 /dashboard/.quarto/
 *.quarto_ipynb
 *.quarto_ipynb_*
+/dashboard/iframe_figures/
 
 __pycache__/
 *.pyc

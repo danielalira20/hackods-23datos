@@ -1,15 +1,22 @@
 ---
-title: "Dashboard - Análisis Formal vs Informal CDMX"
-format: dashboard
+title: "Formal vs Informal - CDMX"
+subtitle: "Análisis de la brecha de ingresos en la Ciudad de México"
+format:
+  dashboard:
+    orientation: rows
+    scrolling: true
 ---
+
 
 ```{python}
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
+import plotly.io as pio
+pio.renderers.default = "notebook"
 # Cargar datos
 df = pd.read_csv('../datos/enoe_cdmx_limpio.csv')
+
 
 # Resumen por sector
 resumen = df.groupby('sector').agg(
@@ -18,38 +25,94 @@ resumen = df.groupby('sector').agg(
     pago_hora=('ingreso_por_hora', 'mean'),
     conteo=('sector', 'count')
 ).reset_index().round(1)
+
+
+# Calcular diferencia
+ingreso_formal = resumen[resumen['sector'] == 'Formal']['ingreso'].values[0]
+ingreso_informal = resumen[resumen['sector'] == 'Informal']['ingreso'].values[0]
+diferencia = ingreso_formal - ingreso_informal
+porcentaje_diferencia = ((ingreso_formal - ingreso_informal) / ingreso_formal * 100)
 ```
+
+
+# Resumen
+
 
 ## Row
 
+
 ```{python}
-#| title: "La brecha de ingreso: Formal vs Informal"
+#| content: valuebox
+#| title: "Ingreso Formal"
+dict(
+    icon="briefcase",
+    color="success",
+    value=f"${ingreso_formal:,.0f}"
+)
+```
+
+
+```{python}
+#| content: valuebox
+#| title: "Ingreso Informal"
+dict(
+    icon="exclamation-triangle",
+    color="danger",
+    value=f"${ingreso_informal:,.0f}"
+)
+```
+
+
+```{python}
+#| content: valuebox
+#| title: "Diferencia"
+dict(
+    icon="cash-coin",
+    color="warning",
+    value=f"${diferencia:,.0f}"
+)
+```
+
+
+```{python}
+#| content: valuebox
+#| title: "Brecha"
+dict(
+    icon="percent",
+    color="info",
+    value=f"{porcentaje_diferencia:.0f}%"
+)
+```
+## Row {height="10%"}
+```{python}
+#| title: "Ingreso mensual promedio (MXN)"
 fig1 = px.bar(
-    resumen,
-    x='sector', y='ingreso',
+    resumen, x='sector', y='ingreso',
     color='sector',
     color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
     text='ingreso'
 )
+# ← texttemplate VA AQUÍ, en traces:
 fig1.update_traces(
-    texttemplate='$%{text:,.0f}', 
+    texttemplate='$%{text:,.0f}',
     textposition='outside'
 )
+# ← height y ejes VAN AQUÍ, en layout:
 fig1.update_layout(
     showlegend=False,
     yaxis_title='Ingreso (MXN)',
     xaxis_title='',
     yaxis_tickprefix='$',
-    height=400
+    yaxis_tickformat=',',
+    height=350  # ← más pequeño
 )
-fig1
 ```
 
+## Row {height="10%"}
 ```{python}
 #| title: "Distribución de trabajadores"
 fig2 = px.bar(
-    resumen,
-    x='sector', y='conteo',
+    resumen, x='sector', y='conteo',
     color='sector',
     color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
     text='conteo'
@@ -62,13 +125,12 @@ fig2.update_layout(
     showlegend=False,
     yaxis_title='Cantidad',
     xaxis_title='',
-    height=400
+    height=350
 )
-fig2
 ```
 
-## Row
 
+## Row {height="10%"}
 ```{python}
 #| title: "Horas trabajadas vs Ingreso por hora"
 fig3 = px.scatter(
@@ -82,8 +144,15 @@ fig3 = px.scatter(
 fig3.update_layout(
     xaxis_title='Horas por semana',
     yaxis_title='Ingreso por hora (MXN)',
-    height=450,
-    showlegend=True
+    showlegend=True,
+    height=450
 )
-fig3
+
+
 ```
+
+
+# Contexto
+
+
+La informalidad en CDMX reduce el ingreso promedio casi a la mitad. Esto afecta directamente la capacidad de ahorro, acceso a servicios y calidad de vida de millones de personas.
