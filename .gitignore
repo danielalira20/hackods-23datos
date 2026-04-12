@@ -1,5 +1,15 @@
 datos/ENOE_SDEMT425.csv
 datos/tvar_crea.csv
 datos/tmodulo.csv
- venv/
+venv/
 .venv/
+
+/dashboard/_site/
+/dashboard/.quarto/
+*.quarto_ipynb
+*.quarto_ipynb_*
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.egg-info/
