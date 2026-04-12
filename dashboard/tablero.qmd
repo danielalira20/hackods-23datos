@@ -92,12 +92,12 @@ fig1 = px.bar(
     color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
     text='ingreso'
 )
-# ← texttemplate VA AQUÍ, en traces:
+
 fig1.update_traces(
     texttemplate='$%{text:,.0f}',
     textposition='outside'
 )
-# ← height y ejes VAN AQUÍ, en layout:
+
 fig1.update_layout(
     showlegend=False,
     yaxis_title='Ingreso (MXN)',
@@ -107,10 +107,17 @@ fig1.update_layout(
     height=350  # ← más pequeño
 )
 ```
-## historia
-lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+
+::: {.callout-warning}
+⚠️ Algun ato critico podria or aqui
+:::
+
 
 ## Row {height="10%"}
+::: {.callout-warning}
+⚠️ Algun ato critico podria or aqui
+:::
 ```{python}
 #| title: "Distribución de trabajadores"
 fig2 = px.bar(
@@ -152,7 +159,9 @@ fig3.update_layout(
 
 
 ```
-
+::: {.callout-warning}
+⚠️ Algun ato critico podria or aqui
+:::
 
 # ocupacion y genero 
 ## Row {height="10%"}
