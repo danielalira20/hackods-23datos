@@ -1,0 +1,89 @@
+---
+title: "Dashboard - Análisis Formal vs Informal CDMX"
+format: dashboard
+---
+
+```{python}
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+# Cargar datos
+df = pd.read_csv('../datos/enoe_cdmx_limpio.csv')
+
+# Resumen por sector
+resumen = df.groupby('sector').agg(
+    horas=('horas_semana', 'mean'),
+    ingreso=('ingreso_mensual', 'mean'),
+    pago_hora=('ingreso_por_hora', 'mean'),
+    conteo=('sector', 'count')
+).reset_index().round(1)
+```
+
+## Row
+
+```{python}
+#| title: "La brecha de ingreso: Formal vs Informal"
+fig1 = px.bar(
+    resumen,
+    x='sector', y='ingreso',
+    color='sector',
+    color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
+    text='ingreso'
+)
+fig1.update_traces(
+    texttemplate='$%{text:,.0f}', 
+    textposition='outside'
+)
+fig1.update_layout(
+    showlegend=False,
+    yaxis_title='Ingreso (MXN)',
+    xaxis_title='',
+    yaxis_tickprefix='$',
+    height=400
+)
+fig1
+```
+
+```{python}
+#| title: "Distribución de trabajadores"
+fig2 = px.bar(
+    resumen,
+    x='sector', y='conteo',
+    color='sector',
+    color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
+    text='conteo'
+)
+fig2.update_traces(
+    texttemplate='%{text:,.0f}',
+    textposition='outside'
+)
+fig2.update_layout(
+    showlegend=False,
+    yaxis_title='Cantidad',
+    xaxis_title='',
+    height=400
+)
+fig2
+```
+
+## Row
+
+```{python}
+#| title: "Horas trabajadas vs Ingreso por hora"
+fig3 = px.scatter(
+    df,
+    x='horas_semana', y='ingreso_por_hora',
+    color='sector',
+    color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
+    opacity=0.5,
+    trendline='ols'
+)
+fig3.update_layout(
+    xaxis_title='Horas por semana',
+    yaxis_title='Ingreso por hora (MXN)',
+    height=450,
+    showlegend=True
+)
+fig3
+```

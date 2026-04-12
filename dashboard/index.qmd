@@ -2,7 +2,6 @@
 title: "Development Indicators by Continent"
 author: "Gapminder Analytics Group"
 format: dashboard
-theme: cosmo
- 
 ---
-hola gente
+
+aqui ira la infromacion de que es el dashboard y como se hizo

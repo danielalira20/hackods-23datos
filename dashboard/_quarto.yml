@@ -6,12 +6,15 @@ jupyter:
     python: "C:\\Users\\magui\\Downloads\\hackODS\\.venv\\Scripts\\python.exe"
 
 website:
-  title: "dashboard"
+  title: "Propuesta"
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: tablero.qmd
+        text: Dashboard
+      - href: about.qmd
+        text: About
 
 format:
   html:
