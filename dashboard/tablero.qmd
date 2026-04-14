@@ -7,18 +7,14 @@ format:
     scrolling: true
 ---
 
-
 ```{python}
+#| output: false
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import plotly.io as pio
-pio.renderers.default = "notebook"
-# Cargar datos
+
 df = pd.read_csv('../datos/enoe_cdmx_limpio.csv')
 
-
-# Resumen por sector
 resumen = df.groupby('sector').agg(
     horas=('horas_semana', 'mean'),
     ingreso=('ingreso_mensual', 'mean'),
@@ -26,64 +22,42 @@ resumen = df.groupby('sector').agg(
     conteo=('sector', 'count')
 ).reset_index().round(1)
 
-
-# Calcular diferencia
-ingreso_formal = resumen[resumen['sector'] == 'Formal']['ingreso'].values[0]
-ingreso_informal = resumen[resumen['sector'] == 'Informal']['ingreso'].values[0]
-diferencia = ingreso_formal - ingreso_informal
-porcentaje_diferencia = ((ingreso_formal - ingreso_informal) / ingreso_formal * 100)
+ingreso_formal    = resumen[resumen['sector'] == 'Formal']['ingreso'].values[0]
+ingreso_informal  = resumen[resumen['sector'] == 'Informal']['ingreso'].values[0]
+diferencia        = ingreso_formal - ingreso_informal
+porcentaje_diferencia = (diferencia / ingreso_formal * 100)
 ```
-
 
 # Sector
 
-
 ## Row
-
 
 ```{python}
 #| content: valuebox
 #| title: "Ingreso Formal"
-dict(
-    icon="briefcase",
-    color="success",
-    value=f"${ingreso_formal:,.0f}"
-)
+dict(icon="briefcase", color="success", value=f"${ingreso_formal:,.0f}")
 ```
-
 
 ```{python}
 #| content: valuebox
 #| title: "Ingreso Informal"
-dict(
-    icon="exclamation-triangle",
-    color="danger",
-    value=f"${ingreso_informal:,.0f}"
-)
+dict(icon="exclamation-triangle", color="danger", value=f"${ingreso_informal:,.0f}")
 ```
-
 
 ```{python}
 #| content: valuebox
 #| title: "Diferencia"
-dict(
-    icon="cash-coin",
-    color="warning",
-    value=f"${diferencia:,.0f}"
-)
+dict(icon="cash-coin", color="warning", value=f"${diferencia:,.0f}")
 ```
-
 
 ```{python}
 #| content: valuebox
 #| title: "Brecha"
-dict(
-    icon="percent",
-    color="info",
-    value=f"{porcentaje_diferencia:.0f}%"
-)
+dict(icon="percent", color="info", value=f"{porcentaje_diferencia:.0f}%")
 ```
-## Row {height="5%"}
+
+## Row {height="35%"}
+
 ```{python}
 #| title: "Ingreso mensual promedio (MXN)"
 fig1 = px.bar(
@@ -91,33 +65,21 @@ fig1 = px.bar(
     color='sector',
     color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
     text='ingreso'
-)
-
-fig1.update_traces(
-    texttemplate='$%{text:,.0f}',
-    textposition='outside'
-)
-
-fig1.update_layout(
+).update_traces(
+    texttemplate='$%{text:,.0f}', textposition='outside'
+).update_layout(
     showlegend=False,
     yaxis_title='Ingreso (MXN)',
     xaxis_title='',
     yaxis_tickprefix='$',
     yaxis_tickformat=',',
-    height=350  # ← más pequeño
+    height=350
 )
+fig1.show()
 ```
 
+## Row {height="35%"}
 
-::: {.callout-warning}
-⚠️ Algun ato critico podria or aqui
-:::
-
-
-## Row {height="10%"}
-::: {.callout-warning}
-⚠️ Algun ato critico podria or aqui
-:::
 ```{python}
 #| title: "Distribución de trabajadores"
 fig2 = px.bar(
@@ -125,21 +87,19 @@ fig2 = px.bar(
     color='sector',
     color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
     text='conteo'
-)
-fig2.update_traces(
-    texttemplate='%{text:,.0f}',
-    textposition='outside'
-)
-fig2.update_layout(
+).update_traces(
+    texttemplate='%{text:,.0f}', textposition='outside'
+).update_layout(
     showlegend=False,
     yaxis_title='Cantidad',
     xaxis_title='',
     height=350
 )
+fig2.show()
 ```
 
+## Row {height="40%"}
 
-## Row {height="10%"}
 ```{python}
 #| title: "Horas trabajadas vs Ingreso por hora"
 fig3 = px.scatter(
@@ -149,27 +109,36 @@ fig3 = px.scatter(
     color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
     opacity=0.5,
     trendline='ols'
-)
-fig3.update_layout(
+).update_layout(
     xaxis_title='Horas por semana',
     yaxis_title='Ingreso por hora (MXN)',
     showlegend=True,
     height=450
 )
-
-
+fig3.show()
 ```
-::: {.callout-warning}
-⚠️ Algun ato critico podria or aqui
-:::
 
-# ocupacion y genero 
-## Row {height="10%"}
+# Ocupacion y genero
+
+## Row {height="30%"}
+
 ```{python}
-#| title: "Horas semanales de traslado al trabajo por sexo"
-act = pd.read_csv('../datos/tvar_crea.csv', low_memory=False)
+#| output: false
+act  = pd.read_csv('../datos/tvar_crea.csv', low_memory=False)
 cdmx = act[act['CVE_ENT'] == 9].copy()
 cdmx['sexo'] = cdmx['SEXO'].map({1: 'Hombre', 2: 'Mujer'})
+cdmx['condicion'] = cdmx['COND_AEE'].map({
+    1: 'Ocupada/o',
+    2: 'Con vínculo laboral',
+    3: 'Desocupada/o',
+    4: 'Estudiante',
+    5: 'Quehaceres del hogar',
+    6: 'Otro inactivo'
+})
+```
+
+```{python}
+#| title: "Horas semanales de traslado al trabajo por sexo"
 traslado_sexo = cdmx.groupby('sexo')['TRAS_TRAB'].mean().reset_index()
 traslado_sexo.columns = ['Sexo', 'Horas_traslado']
 traslado_sexo['Horas_traslado'] = traslado_sexo['Horas_traslado'].round(2)
@@ -180,33 +149,21 @@ fig4 = px.bar(
     color='Sexo',
     color_discrete_map={'Hombre': '#3B82F6', 'Mujer': '#EC4899'},
     text='Horas_traslado'
-)
-fig4.update_traces(
-    texttemplate='%{text} hrs', 
-    textposition='outside'
-)
-fig4.update_layout(
-    showlegend=False, 
-    yaxis_title='Horas por semana', 
-    xaxis_title='', 
+).update_traces(
+    texttemplate='%{text} hrs', textposition='outside'
+).update_layout(
+    showlegend=False,
+    yaxis_title='Horas por semana',
+    xaxis_title='',
     height=250
 )
+fig4.show()
 ```
 
-## Row {height="15%"}
+## Row {height="35%"}
+
 ```{python}
 #| title: "Tiempo libre semanal por condición de actividad"
-act = pd.read_csv('../datos/tvar_crea.csv', low_memory=False)
-cdmx = act[act['CVE_ENT'] == 9].copy()
-cdmx['condicion'] = cdmx['COND_AEE'].map({
-    1: 'Ocupada/o',
-    2: 'Con vínculo laboral', 
-    3: 'Desocupada/o',
-    4: 'Estudiante',
-    5: 'Quehaceres del hogar',
-    6: 'Otro inactivo'
-})
-
 tlibre = cdmx.groupby('condicion')['ACTIV_CONVIV'].mean().reset_index()
 tlibre.columns = ['Condicion', 'Tiempo_libre']
 tlibre = tlibre.sort_values('Tiempo_libre')
@@ -218,34 +175,22 @@ fig5 = px.bar(
     color='Tiempo_libre',
     color_continuous_scale='Teal',
     text='Tiempo_libre'
-)
-fig5.update_traces(
-    texttemplate='%{text:.1f} hrs', 
-    textposition='outside'
-)
-fig5.update_layout(
-    coloraxis_showscale=False, 
-    xaxis_title='Horas de convivencia/semana', 
-    yaxis_title='', 
+).update_traces(
+    texttemplate='%{text:.1f} hrs', textposition='outside'
+).update_layout(
+    coloraxis_showscale=False,
+    xaxis_title='Horas de convivencia/semana',
+    yaxis_title='',
     height=300
 )
+fig5.show()
 ```
 
-## Row {height="15%"}
+## Row {height="35%"}
+
 ```{python}
 #| title: "Resumen tiempo por condición laboral"
-act = pd.read_csv('../datos/tvar_crea.csv', low_memory=False)
-cdmx = act[act['CVE_ENT'] == 9].copy()
-cdmx['condicion'] = cdmx['COND_AEE'].map({
-    1: 'Ocupada/o',
-    2: 'Con vínculo laboral', 
-    3: 'Desocupada/o',
-    4: 'Estudiante',
-    5: 'Quehaceres del hogar',
-    6: 'Otro inactivo'
-})
-
-resumen = cdmx.groupby('condicion').agg(
+resumen_enut = cdmx.groupby('condicion').agg(
     traslado=('TRAS_TRAB', 'mean'),
     trabajo=('ACTIV_MERC', 'mean'),
     tiempo_libre=('ACTIV_CONVIV', 'mean'),
@@ -253,131 +198,135 @@ resumen = cdmx.groupby('condicion').agg(
 ).round(2).reset_index()
 
 fig6 = px.bar(
-    resumen,
+    resumen_enut,
     x='condicion', y=['traslado', 'trabajo', 'tiempo_libre'],
-    title="Tiempos semanales por condición (hrs)",
     color_discrete_map={
         'traslado': '#F59E0B',
-        'trabajo': '#14B8A6', 
+        'trabajo': '#14B8A6',
         'tiempo_libre': '#8B5CF6'
     }
-)
-fig6.update_layout(
+).update_layout(
     showlegend=True,
     xaxis_title='Condición laboral',
     yaxis_title='Horas por semana',
     height=300
 )
+fig6.show()
 ```
 
 # Metro
 
-## Row {height="12%"}
+## Row {height="30%"}
+
+```{python}
+#| output: false
+ZONA_NORTE = ["Gustavo A. Madero", "Azcapotzalco", "Venustiano Carranza", "Estado de México", "Nezahualcóyotl (Edomex)"]
+ZONA_SUR   = ["Coyoacán", "Álvaro Obregón", "Magdalena Contreras", "Tláhuac", "Xochimilco"]
+
+df_metro = pd.read_csv('../datos/metro_limpio.csv', parse_dates=["fecha"])
+df_metro["zona"] = df_metro["alcaldia"].apply(
+    lambda a: "Norte/Nororiente" if a in ZONA_NORTE else ("Sur/Poniente" if a in ZONA_SUR else "Centro")
+)
+df_metro["dia_semana"] = df_metro["fecha"].dt.dayofweek
+df_metro["dia_nombre"] = df_metro["dia_semana"].map({0:"Lun",1:"Mar",2:"Mié",3:"Jue",4:"Vie",5:"Sáb",6:"Dom"})
+```
+
 ```{python}
 #| title: "Afluencia total por alcaldía (millones)"
-df_metro = pd.read_csv('../datos/metro_limpio.csv', parse_dates=["fecha"])
-ZONA_NORTE_NORORIENTE = ["Gustavo A. Madero", "Azcapotzalco", "Venustiano Carranza", "Estado de México", "Nezahualcóyotl (Edomex)"]
-ZONA_SUR_PONIENTE = ["Coyoacán", "Álvaro Obregón", "Magdalena Contreras", "Tláhuac", "Xochimilco"]
-
-por_alcaldia = df_metro.groupby("alcaldia")["afluencia"].sum().reset_index()
+por_alcaldia = df_metro.groupby(["alcaldia","zona"])["afluencia"].sum().reset_index()
 por_alcaldia["afluencia_millones"] = (por_alcaldia["afluencia"] / 1_000_000).round(2)
-por_alcaldia["zona"] = por_alcaldia["alcaldia"].apply(
-    lambda a: "Norte/Nororiente" if a in ZONA_NORTE_NORORIENTE else ("Sur/Poniente" if a in ZONA_SUR_PONIENTE else "Centro")
-)
+por_alcaldia = por_alcaldia.sort_values("afluencia_millones", ascending=False).head(10)
 
 fig7 = px.bar(
-    por_alcaldia.head(10),
+    por_alcaldia,
     x='afluencia_millones', y='alcaldia',
     orientation='h',
     color='zona',
     color_discrete_map={'Norte/Nororiente': '#F59E0B', 'Sur/Poniente': '#14B8A6', 'Centro': '#8B5CF6'},
     text='afluencia_millones'
-)
-fig7.update_traces(texttemplate='%{text:.1f}M', textposition='outside')
-fig7.update_layout(
-    showlegend=True, 
-    xaxis_title='Millones de viajes', 
-    yaxis_title='', 
+).update_traces(
+    texttemplate='%{text:.1f}M', textposition='outside'
+).update_layout(
+    showlegend=True,
+    xaxis_title='Millones de viajes',
+    yaxis_title='',
     height=280
 )
+fig7.show()
 ```
 
-## Row {height="12%"}
+## Row {height="30%"}
+
 ```{python}
 #| title: "Top 10 estaciones más concurridas"
-df_metro = pd.read_csv('../datos/metro_limpio.csv')
-top_estaciones = df_metro.groupby(["estacion", "alcaldia"])["afluencia"].sum().reset_index().sort_values("afluencia", ascending=False).head(10)
-top_estaciones["afluencia_millones"] = (top_estaciones["afluencia"] / 1_000_000).round(2)
+top_est = df_metro.groupby(["estacion","alcaldia"])["afluencia"].sum().reset_index()
+top_est = top_est.sort_values("afluencia", ascending=False).head(10)
+top_est["afluencia_millones"] = (top_est["afluencia"] / 1_000_000).round(2)
 
 fig8 = px.bar(
-    top_estaciones,
+    top_est,
     x='afluencia_millones', y='estacion',
     orientation='h',
     text='afluencia_millones',
     color='alcaldia',
     color_discrete_sequence=px.colors.qualitative.Set3
-)
-fig8.update_traces(texttemplate='%{text:.1f}M', textposition='outside')
-fig8.update_layout(
-    showlegend=False, 
-    xaxis_title='Millones de viajes', 
-    yaxis_title='Estación', 
+).update_traces(
+    texttemplate='%{text:.1f}M', textposition='outside'
+).update_layout(
+    showlegend=False,
+    xaxis_title='Millones de viajes',
+    yaxis_title='',
     height=280
 )
+fig8.show()
 ```
 
-## Row {height="12%"}
+## Row {height="30%"}
+
 ```{python}
 #| title: "Tendencia Norte vs Sur (2010-2025)"
-df_metro = pd.read_csv('../datos/metro_limpio.csv', parse_dates=["fecha"])
-ZONA_NORTE_NORORIENTE = ["Gustavo A. Madero", "Azcapotzalco", "Venustiano Carranza", "Estado de México", "Nezahualcóyotl (Edomex)"]
-ZONA_SUR_PONIENTE = ["Coyoacán", "Álvaro Obregón", "Magdalena Contreras", "Tláhuac", "Xochimilco"]
+tendencia = df_metro.groupby(["anio","zona"])["afluencia"].sum().reset_index()
 
-df_metro["zona"] = df_metro["alcaldia"].apply(
-    lambda a: "Norte/Nororiente" if a in ZONA_NORTE_NORORIENTE else ("Sur/Poniente" if a in ZONA_SUR_PONIENTE else "Centro")
-)
-
-tendencia = df_metro.groupby(["anio", "zona"])["afluencia"].sum().reset_index()
 fig9 = px.line(
-    tendencia, 
-    x='anio', y='afluencia', 
+    tendencia,
+    x='anio', y='afluencia',
     color='zona',
     color_discrete_map={'Norte/Nororiente': '#F59E0B', 'Sur/Poniente': '#14B8A6', 'Centro': '#8B5CF6'},
     markers=True
-)
-fig9.update_layout(
-    xaxis_title='Año', 
-    yaxis_title='Viajes (millones)',
+).update_traces(
+    line=dict(width=3)
+).update_layout(
+    xaxis_title='Año',
+    yaxis_title='Viajes',
     yaxis_tickformat=',.0f',
     height=280,
     legend_title="Zona"
 )
-fig9.update_traces(line=dict(width=3))
+fig9.show()
 ```
 
-## Row {height="12%"}
+## Row {height="30%"}
+
 ```{python}
 #| title: "Patrón semanal - Zona Norte/Nororiente"
-df_metro = pd.read_csv('../datos/metro_limpio.csv', parse_dates=["fecha"])
-ZONA_NORTE_NORORIENTE = ["Gustavo A. Madero", "Azcapotzalco", "Venustiano Carranza", "Estado de México", "Nezahualcóyotl (Edomex)"]
-df_metro["zona"] = df_metro["alcaldia"].apply(lambda a: "Norte/Nororiente" if a in ZONA_NORTE_NORORIENTE else "Otros")
-df_metro["dia_semana"] = df_metro["fecha"].dt.dayofweek
-df_metro["dia_nombre"] = df_metro["dia_semana"].map({0:"Lun",1:"Mar",2:"Mié",3:"Jue",4:"Vie",5:"Sáb",6:"Dom"})
-
 norte_semanal = df_metro[df_metro["zona"] == "Norte/Nororiente"].groupby("dia_nombre")["afluencia"].mean().reset_index()
 norte_semanal["afluencia_miles"] = (norte_semanal["afluencia"] / 1000).round(0)
+
+orden_dias = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"]
+norte_semanal["dia_nombre"] = pd.Categorical(norte_semanal["dia_nombre"], categories=orden_dias, ordered=True)
+norte_semanal = norte_semanal.sort_values("dia_nombre")
 
 fig10 = px.bar(
     norte_semanal,
     x='dia_nombre', y='afluencia_miles',
-    text='afluencia_miles',
-    title="Promedio diario (miles de viajes)"
-)
-fig10.update_traces(texttemplate='%{text}K', textposition='outside')
-fig10.update_layout(
-    showlegend=False, 
-    xaxis_title='Día de la semana', 
-    yaxis_title='Miles de viajes', 
+    text='afluencia_miles'
+).update_traces(
+    texttemplate='%{text:.0f}K', textposition='outside'
+).update_layout(
+    showlegend=False,
+    xaxis_title='Día de la semana',
+    yaxis_title='Miles de viajes',
     height=280
 )
+fig10.show()
 ```

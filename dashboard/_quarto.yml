@@ -3,7 +3,7 @@ project:
 
 jupyter:
   python:
-    python: "C:\\Users\\magui\\Downloads\\hackODS\\.venv\\Scripts\\python.exe"
+    python: python3
 
 website:
   title: "Propuesta"
