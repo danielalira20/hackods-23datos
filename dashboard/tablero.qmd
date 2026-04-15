@@ -78,7 +78,7 @@ fig1 = px.bar(
 fig1.show()
 ```
 
-## Row {height="35%"}
+
 
 ```{python}
 #| title: "Distribución de trabajadores"
