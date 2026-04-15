@@ -259,7 +259,7 @@ fig6.show()
 
 # Metro
 
-## Row {height="30%"}
+## Row 
 
 ```{python}
 #| output: false
@@ -272,7 +272,48 @@ df_metro["zona"] = df_metro["alcaldia"].apply(
 )
 df_metro["dia_semana"] = df_metro["fecha"].dt.dayofweek
 df_metro["dia_nombre"] = df_metro["dia_semana"].map({0:"Lun",1:"Mar",2:"Mié",3:"Jue",4:"Vie",5:"Sáb",6:"Dom"})
+
+# Calcular métricas del Metro
+total_viajes = df_metro["afluencia"].sum()
+total_viajes_millones = total_viajes / 1_000_000
+
+afluencia_promedio_diaria = df_metro.groupby("fecha")["afluencia"].sum().mean()
+afluencia_promedio_millones = afluencia_promedio_diaria / 1_000_000
+
+# Zona con más afluencia
+afluencia_por_zona = df_metro.groupby("zona")["afluencia"].sum()
+zona_mayor = afluencia_por_zona.idxmax()
+
+# Año con mayor afluencia
+anio_mayor = df_metro['fecha'].dt.year.max()
+afluencia_anio_mayor = df_metro[df_metro['fecha'].dt.year == anio_mayor]["afluencia"].sum() / 1_000_000
 ```
+
+```{python}
+#| content: valuebox
+#| title: "Viajes Totales"
+dict(icon="train-subway", color="info", value=f"{total_viajes_millones:.1f}M")
+```
+
+```{python}
+#| content: valuebox
+#| title: "Afluencia Promedio Diaria"
+dict(icon="graph-up", color="success", value=f"{afluencia_promedio_millones:.2f}M")
+```
+
+```{python}
+#| content: valuebox
+#| title: "Zona Predominante"
+dict(icon="map", color="warning", value=f"{zona_mayor}")
+```
+
+```{python}
+#| content: valuebox
+#| title: "Total de Estaciones"
+dict(icon="building", color="danger", value=f"{anio_mayor}")
+```
+
+## Row {height="30%"}
 
 ```{python}
 #| title: "Afluencia total por alcaldía (millones)"
@@ -298,7 +339,6 @@ fig7 = px.bar(
 fig7.show()
 ```
 
-## Row {height="30%"}
 
 ```{python}
 #| title: "Top 10 estaciones más concurridas"
