@@ -120,7 +120,7 @@ fig3.show()
 
 # Ocupacion y genero
 
-## Row {height="30%"}
+## Row
 
 ```{python}
 #| output: false
@@ -135,7 +135,50 @@ cdmx['condicion'] = cdmx['COND_AEE'].map({
     5: 'Quehaceres del hogar',
     6: 'Otro inactivo'
 })
+
+# Calcular métricas de género y ocupación
+total_mujeres = len(cdmx[cdmx['sexo'] == 'Mujer'])
+total_hombres = len(cdmx[cdmx['sexo'] == 'Hombre'])
+
+mujeres_ocupadas = len(cdmx[(cdmx['sexo'] == 'Mujer') & (cdmx['condicion'] == 'Ocupada/o')])
+hombres_ocupados = len(cdmx[(cdmx['sexo'] == 'Hombre') & (cdmx['condicion'] == 'Ocupada/o')])
+
+pct_mujeres_ocupadas = (mujeres_ocupadas / total_mujeres * 100) if total_mujeres > 0 else 0
+pct_hombres_ocupados = (hombres_ocupados / total_hombres * 100) if total_hombres > 0 else 0
+
+brecha_participacion = pct_hombres_ocupados - pct_mujeres_ocupadas
+
+# Horas de trabajo
+horas_mujeres = cdmx[cdmx['sexo'] == 'Mujer']['ACTIV_MERC'].mean() if total_mujeres > 0 else 0
+horas_hombres = cdmx[cdmx['sexo'] == 'Hombre']['ACTIV_MERC'].mean() if total_hombres > 0 else 0
+diferencia_horas = horas_hombres - horas_mujeres
 ```
+
+```{python}
+#| content: valuebox
+#| title: "% Mujeres Ocupadas"
+dict(icon="person-check", color="danger", value=f"{pct_mujeres_ocupadas:.0f}%")
+```
+
+```{python}
+#| content: valuebox
+#| title: "% Hombres Ocupados"
+dict(icon="person-check", color="info", value=f"{pct_hombres_ocupados:.0f}%")
+```
+
+```{python}
+#| content: valuebox
+#| title: "Brecha de Participación"
+dict(icon="arrow-left-right", color="warning", value=f"{brecha_participacion:.1f}pp")
+```
+
+```{python}
+#| content: valuebox
+#| title: "Diferencia Horas de Trabajo"
+dict(icon="clock", color="success", value=f"{diferencia_horas:.1f} hrs")
+```
+
+## Row {height="30%"}
 
 ```{python}
 #| title: "Horas semanales de traslado al trabajo por sexo"
@@ -160,7 +203,7 @@ fig4 = px.bar(
 fig4.show()
 ```
 
-## Row {height="35%"}
+
 
 ```{python}
 #| title: "Tiempo libre semanal por condición de actividad"
