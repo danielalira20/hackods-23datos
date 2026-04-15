@@ -4,7 +4,7 @@
 
 ---
 
-##Equipo
+## Equipo
 
 **2-3 Datos**
 
