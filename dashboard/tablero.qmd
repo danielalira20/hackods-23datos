@@ -349,17 +349,6 @@ def crear_mapa():
         horizontal_spacing=0.03
     )
 
-    fig.add_trace(go.Densitymapbox(
-        lat=df_mapa['lat'],
-        lon=df_mapa['lon'],
-        z=df_mapa['afluencia_millones'],
-        radius=38,
-        opacity=0.55,
-        colorscale='YlOrRd',
-        hoverinfo='skip',
-        showscale=False
-    ), row=1, col=1)
-
     fig.add_trace(go.Scattermapbox(
         lat=df_mapa['lat'], lon=df_mapa['lon'],
         mode='markers',
@@ -396,18 +385,27 @@ crear_mapa()
 ## Row {height="30%"}
 
 ```{python}
-#| title: "Tendencia Norte vs Sur (2010-2025)"
-tendencia = df_metro.groupby(["anio","zona"])["afluencia"].sum().reset_index()
-
-px.line(
-    tendencia,
-    x='anio', y='afluencia',
-    color='zona',
-    color_discrete_map={'Norte/Nororiente': '#F59E0B', 'Sur/Poniente': '#14B8A6', 'Centro': '#8B5CF6'},
-    markers=True,
-    title=""
+#| title: "Viajes desde el Estado de México — Estaciones en territorio Edomex"
+edomex = pd.read_csv('../datos/resultados_analisis_metro/03_estaciones_edomex.csv')
+edomex = edomex.sort_values('promedio_diario')
+ 
+fig_edomex = px.bar(
+    edomex,
+    x='promedio_diario', y='estacion',
+    orientation='h',
+    color='linea',
+    text='promedio_diario'
+).update_traces(
+    texttemplate='%{text:,} viajes/día', textposition='outside'
+).update_layout(
+    showlegend=True,
+    xaxis_title='Promedio de viajes diarios',
+    yaxis_title='',
+    height=420,
+    #legend_title='Línea',
+    legend=dict(orientation='h', y=-0.25, x=0.5, xanchor='center')
 )
-
+fig_edomex
 ```
 
 ## Row {height="30%"}
@@ -435,3 +433,4 @@ fig10 = px.bar(
 )
 fig10.show()
 ```
+
