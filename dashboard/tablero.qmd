@@ -301,67 +301,96 @@ dict(icon="train-subway", color="info", value=f"{total_viajes_millones:.1f}M")
 dict(icon="graph-up", color="success", value=f"{afluencia_promedio_millones:.2f}M")
 ```
 
-```{python}
-#| content: valuebox
-#| title: "Zona Predominante"
-dict(icon="map", color="warning", value=f"{zona_mayor}")
-```
+
 
 ```{python}
 #| content: valuebox
 #| title: "Total de Estaciones"
-dict(icon="building", color="danger", value=f"{anio_mayor}")
+dict(icon="building", color="danger", value=f"195")
 ```
 
 ## Row {height="30%"}
 
-```{python}
-#| title: "Afluencia total por alcaldía (millones)"
-por_alcaldia = df_metro.groupby(["alcaldia","zona"])["afluencia"].sum().reset_index()
-por_alcaldia["afluencia_millones"] = (por_alcaldia["afluencia"] / 1_000_000).round(2)
-por_alcaldia = por_alcaldia.sort_values("afluencia_millones", ascending=False).head(10)
 
-fig7 = px.bar(
-    por_alcaldia,
-    x='afluencia_millones', y='alcaldia',
-    orientation='h',
-    color='zona',
-    color_discrete_map={'Norte/Nororiente': '#F59E0B', 'Sur/Poniente': '#14B8A6', 'Centro': '#8B5CF6'},
-    text='afluencia_millones'
-).update_traces(
-    texttemplate='%{text:.1f}M', textposition='outside'
-).update_layout(
-    showlegend=True,
-    xaxis_title='Millones de viajes',
-    yaxis_title='',
-    height=280
-)
-fig7.show()
-```
 
 
 ```{python}
-#| title: "Top 10 estaciones más concurridas"
-top_est = df_metro.groupby(["estacion","alcaldia"])["afluencia"].sum().reset_index()
-top_est = top_est.sort_values("afluencia", ascending=False).head(10)
-top_est["afluencia_millones"] = (top_est["afluencia"] / 1_000_000).round(2)
+#| title: "Mapa de Estaciones Críticas (Afluencia Acumulada)"
+from plotly.subplots import make_subplots
 
-fig8 = px.bar(
-    top_est,
-    x='afluencia_millones', y='estacion',
-    orientation='h',
-    text='afluencia_millones',
-    color='alcaldia',
-    color_discrete_sequence=px.colors.qualitative.Set3
-).update_traces(
-    texttemplate='%{text:.1f}M', textposition='outside'
-).update_layout(
-    showlegend=False,
-    xaxis_title='Millones de viajes',
-    yaxis_title='',
-    height=280
-)
-fig8.show()
+def crear_mapa():
+    top_est = df_metro.groupby(["estacion", "alcaldia"])["afluencia"].sum().reset_index()
+    top_est = top_est.sort_values("afluencia", ascending=False).head(15)
+    top_est["afluencia_millones"] = (top_est["afluencia"] / 1_000_000).round(2)
+
+    coords = {
+        'Indios Verdes': [19.4954, -99.1195], 'Cuatro Caminos': [19.4596, -99.2158],
+        'Constitución de 1917': [19.3460, -99.0639], 'Tasqueña': [19.3437, -99.1395],
+        'Pantitlán': [19.4151, -99.0743], 'Universidad': [19.3243, -99.1739],
+        'Zócalo/Tenochtitlan': [19.4325, -99.1322], 'Observatorio': [19.3982, -99.2004],
+        'Ciudad Azteca': [19.5341, -99.0272], 'Buenavista': [19.4468, -99.1531],
+        'Tacubaya': [19.4032, -99.1871], 'Chapultepec': [19.4204, -99.1763],
+        'Insurgentes': [19.4233, -99.1628], 'Zaragoza': [19.4121, -99.0823],
+        'Merced': [19.4255, -99.1245]
+    }
+
+    top_est['lat'] = top_est['estacion'].map(lambda x: coords.get(x, [None, None])[0])
+    top_est['lon'] = top_est['estacion'].map(lambda x: coords.get(x, [None, None])[1])
+    df_mapa = top_est.dropna(subset=['lat']).copy()
+
+    colores = ['#E63946', '#457B9D', '#1D3557', '#A8DADC', '#F1FAEE', '#FFB703', '#FB8500', '#8E9AAF', '#CBC0D3', '#EFD3D7']
+    df_mapa["color"] = [colores[i % len(colores)] for i in range(len(df_mapa))]
+    marker_sizes = (df_mapa['afluencia_millones'] * 6).clip(lower=16, upper=44)
+
+    fig = make_subplots(
+        rows=1, cols=2,
+        specs=[[{"type": "scattermapbox"}, {"type": "table"}]],
+        column_widths=[0.62, 0.38],
+        horizontal_spacing=0.03
+    )
+
+    fig.add_trace(go.Densitymapbox(
+        lat=df_mapa['lat'],
+        lon=df_mapa['lon'],
+        z=df_mapa['afluencia_millones'],
+        radius=38,
+        opacity=0.55,
+        colorscale='YlOrRd',
+        hoverinfo='skip',
+        showscale=False
+    ), row=1, col=1)
+
+    fig.add_trace(go.Scattermapbox(
+        lat=df_mapa['lat'], lon=df_mapa['lon'],
+        mode='markers',
+        marker=dict(size=marker_sizes, sizemode='diameter', sizemin=12, color=df_mapa['color'], opacity=0.8),
+        customdata=df_mapa[['alcaldia', 'afluencia_millones']],
+        text=df_mapa['estacion'],
+        hovertemplate='<b>%{text}</b><br>Alcaldía: %{customdata[0]}<br>Afluencia: %{customdata[1]:.2f}M<extra></extra>',
+        showlegend=False
+    ), row=1, col=1)
+
+    fig.add_trace(go.Table(
+        header=dict(values=['', 'Estación', 'Alcaldía', 'Afluencia'],
+            fill_color='#F3F4F6', align=['center', 'left', 'left', 'right'],
+            font=dict(color='#111827', size=12), height=28),
+        cells=dict(
+            values=[[''] * len(df_mapa), df_mapa['estacion'], df_mapa['alcaldia'],
+                    [f"{v:.2f}M" for v in df_mapa['afluencia_millones']]],
+            fill_color=[df_mapa['color'], ['white']*len(df_mapa), ['white']*len(df_mapa), ['white']*len(df_mapa)],
+            align=['center', 'left', 'left', 'right'],
+            font=dict(color=['rgba(0,0,0,0)', '#111827', '#111827', '#111827'], size=11),
+            height=24),
+        columnwidth=[26, 140, 120, 70]
+    ), row=1, col=2)
+
+    fig.update_layout(
+        height=460, margin=dict(l=0, r=0, t=10, b=0),
+        mapbox=dict(style='carto-positron', zoom=10.3, center=dict(lat=19.4326, lon=-99.1332))
+    )
+    return fig
+
+crear_mapa()
 ```
 
 ## Row {height="30%"}
@@ -370,22 +399,15 @@ fig8.show()
 #| title: "Tendencia Norte vs Sur (2010-2025)"
 tendencia = df_metro.groupby(["anio","zona"])["afluencia"].sum().reset_index()
 
-fig9 = px.line(
+px.line(
     tendencia,
     x='anio', y='afluencia',
     color='zona',
     color_discrete_map={'Norte/Nororiente': '#F59E0B', 'Sur/Poniente': '#14B8A6', 'Centro': '#8B5CF6'},
-    markers=True
-).update_traces(
-    line=dict(width=3)
-).update_layout(
-    xaxis_title='Año',
-    yaxis_title='Viajes',
-    yaxis_tickformat=',.0f',
-    height=280,
-    legend_title="Zona"
+    markers=True,
+    title=""
 )
-fig9.show()
+
 ```
 
 ## Row {height="30%"}
