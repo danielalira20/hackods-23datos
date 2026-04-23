@@ -1,12 +1,13 @@
 ---
-title: ""
+title: "ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2025"
+subtitle: "Madrugan a las 5 AM. Regresan de noche. Y aún así, no alcanza."
 lang: es
 format:
-  html:
-    page-layout: full
-    toc: false
+  dashboard:
+    orientation: rows
+    scrolling: true
 ---
-
+# Home
 :::{style="background: white; min-height: 96vh; display: flex; align-items: center; justify-content: center; padding: 6rem 2rem; font-family: 'Segoe UI', sans-serif; border-bottom: 4px solid #14B8A6;"}
 
 :::{style="max-width: 820px; margin: 0 auto; text-align: center;"}
@@ -235,3 +236,4 @@ para sostener una ciudad que muchas veces no les pertenece.]{style="color: #4755
 [Hecho con datos — y con coraje. · HackODS UNAM 2026]{style="color: #475569; font-size: 0.78rem; display: block; margin-top: 0.4rem;"}
 
 :::
+{{< include tablero.qmd >}}

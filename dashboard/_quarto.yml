@@ -5,20 +5,10 @@ project:
 jupyter:
   python:
     python: python3
-
-website:
-  title: "Propuesta"
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - href: tablero.qmd
-        text: Dashboard
-
+ 
 format:
-  html:
-    theme:
-      - cosmo
-      - brand
+  dashboard:
+    theme: cosmo
     css: styles.css
-    toc: true
+    orientation: rows
+    scrolling: true
