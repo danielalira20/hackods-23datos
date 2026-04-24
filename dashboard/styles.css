@@ -105,8 +105,8 @@
 }
 
 .cta-button {
-  background: var(--dark);
-  color: white;
+  background: var(--warning);
+  color: white ;
   font-weight: 800;
   padding: 1rem 2.6rem;
   border-radius: 50px;
@@ -116,7 +116,9 @@
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-align: center;
 }
+
 
 .cta-button:hover {
   opacity: 0.9;

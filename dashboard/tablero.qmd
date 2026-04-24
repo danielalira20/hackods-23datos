@@ -1,10 +1,11 @@
----
+<!-- ---
+title: ""
+subtitle: ""
 format:
   dashboard:
     orientation: rows
     scrolling: true
-
----
+--- -->
 
 ```{python}
 #| output: false
@@ -92,6 +93,16 @@ px.box(
     ]
 )
 ```
+## Row
+:::{.section-title-large}
+
+El impuesto del tiempo.
+El costo de la informalidad no solo se mide en pesos, sino en la moneda más escasa para quien vive al día: el tiempo.
+
+En la Ciudad de México, el sistema de transporte y la mancha urbana imponen una "cuota" de traslado similar para todos, pero el peso de esa cuota es regresivo. Para el trabajador informal, las horas perdidas en el tráfico no son solo cansancio; representan una porción mucho más agresiva de su valor generado.
+
+Mientras que un trabajador formal ve consumirse una parte de su ingreso anual en el trayecto, para el informal el impacto es proporcionalmente mayor. El sistema no solo les paga menos por hora, sino que les cobra más caro el derecho a llegar a su trabajo.
+:::
 
 ## Row {height="40%"}
 
