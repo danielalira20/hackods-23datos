@@ -4,10 +4,9 @@ datos/tmodulo.csv
 venv/
 .venv/
 
-# Quarto generated files
 /dashboard/_site/
 /dashboard/.quarto/
-/docs/
+
 *.quarto_ipynb
 *.quarto_ipynb_*
 /dashboard/iframe_figures/
@@ -18,5 +17,4 @@ __pycache__/
 .ipynb_checkpoints/
 *.egg-info/
 
-# UV (Python package manager)
 .uv/
