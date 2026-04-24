@@ -348,12 +348,10 @@ dict(icon="building", color="danger", value=f"195")
 ```{python}
 #| title: "Mapa de Estaciones Críticas (Afluencia Acumulada)"
 from plotly.subplots import make_subplots
-
 def crear_mapa():
     top_est = df_metro.groupby(["estacion", "alcaldia"])["afluencia"].sum().reset_index()
     top_est = top_est.sort_values("afluencia", ascending=False).head(15)
     top_est["afluencia_millones"] = (top_est["afluencia"] / 1_000_000).round(2)
-
     coords = {
         'Indios Verdes': [19.4954, -99.1195], 'Cuatro Caminos': [19.4596, -99.2158],
         'Constitución de 1917': [19.3460, -99.0639], 'Tasqueña': [19.3437, -99.1395],
@@ -364,22 +362,18 @@ def crear_mapa():
         'Insurgentes': [19.4233, -99.1628], 'Zaragoza': [19.4121, -99.0823],
         'Merced': [19.4255, -99.1245]
     }
-
     top_est['lat'] = top_est['estacion'].map(lambda x: coords.get(x, [None, None])[0])
     top_est['lon'] = top_est['estacion'].map(lambda x: coords.get(x, [None, None])[1])
     df_mapa = top_est.dropna(subset=['lat']).copy()
-
     colores = ['#E63946', '#457B9D', '#1D3557', '#A8DADC', '#F1FAEE', '#FFB703', '#FB8500', '#8E9AAF', '#CBC0D3', '#EFD3D7']
     df_mapa["color"] = [colores[i % len(colores)] for i in range(len(df_mapa))]
     marker_sizes = (df_mapa['afluencia_millones'] * 6).clip(lower=16, upper=44)
-
     fig = make_subplots(
         rows=1, cols=2,
         specs=[[{"type": "scattermapbox"}, {"type": "table"}]],
         column_widths=[0.62, 0.38],
         horizontal_spacing=0.03
     )
-
     fig.add_trace(go.Scattermapbox(
         lat=df_mapa['lat'], lon=df_mapa['lon'],
         mode='markers',
@@ -389,7 +383,6 @@ def crear_mapa():
         hovertemplate='<b>%{text}</b><br>Alcaldía: %{customdata[0]}<br>Afluencia: %{customdata[1]:.2f}M<extra></extra>',
         showlegend=False
     ), row=1, col=1)
-
     fig.add_trace(go.Table(
         header=dict(values=['', 'Estación', 'Alcaldía', 'Afluencia'],
             fill_color='#F3F4F6', align=['center', 'left', 'left', 'right'],
@@ -403,13 +396,11 @@ def crear_mapa():
             height=24),
         columnwidth=[26, 140, 120, 70]
     ), row=1, col=2)
-
     fig.update_layout(
         height=460, margin=dict(l=0, r=0, t=10, b=0),
         mapbox=dict(style='carto-positron', zoom=10.3, center=dict(lat=19.4326, lon=-99.1332))
     )
     return fig
-
 crear_mapa()
 ```
 
