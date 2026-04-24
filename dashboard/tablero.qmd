@@ -158,6 +158,16 @@ px.bar(
 )
 ```
 
+## Row {height="10%"}
+
+::: {.card}
+:::{.section-dark}
+[Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
+
+[HackODS UNAM 2026 · Ir a Datos](#datos){.footer-text-secondary}
+:::
+:::
+
 # Ocupacion y genero
 
 ## Row
@@ -297,6 +307,16 @@ fig6 = px.bar(
 fig6.show()
 ```
 
+## Row {height="10%"}
+
+::: {.card}
+:::{.section-dark}
+[Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
+
+[HackODS UNAM 2026 · Ir a Datos](#datos){.footer-text-secondary}
+:::
+:::
+
 # Metro
 
 ## Row 
@@ -332,13 +352,13 @@ afluencia_anio_mayor = df_metro[df_metro['fecha'].dt.year == anio_mayor]["afluen
 ```{python}
 #| content: valuebox
 #| title: "Viajes Totales"
-dict(icon="train-subway", color="info", value=f"{total_viajes_millones:.1f}M")
+dict(icon="train-front", color="info", value=f"{total_viajes_millones:,.1f}M")
 ```
 
 ```{python}
 #| content: valuebox
 #| title: "Afluencia Promedio Diaria"
-dict(icon="graph-up", color="success", value=f"{afluencia_promedio_millones:.2f}M")
+dict(icon="graph-up", color="success", value=f"{afluencia_promedio_millones:,.2f}M")
 ```
 
 
@@ -413,6 +433,16 @@ def crear_mapa():
     return fig
 crear_mapa()
 ```
+## row
+:::{.section-title-large}
+
+Los nudos del sistema: Donde la ciudad converge y colapsa.
+El mapa no solo muestra estaciones de metro; dibuja las venas abiertas de la movilidad en la CDMX. La concentración masiva de afluencia en terminales como Pantitlán, Indios Verdes y Cuatro Caminos confirma que el sistema de transporte carga con el peso de millones que vienen de las periferias.
+
+Estas 15 estaciones son los puntos donde el "impuesto del tiempo" se cobra con mayor rigor. Son espacios donde la infraestructura llega a su límite, obligando al trabajador —especialmente al informal, que carece de opciones de transporte privado— a navegar los nodos más saturados del mundo para poder generar un ingreso.
+
+La saturación no es un error de logística, es el síntoma geográfico de la brecha salarial.
+:::
 
 ## Row {height="30%"}
 
@@ -468,3 +498,65 @@ fig10 = px.bar(
 )
 fig10.show()
 ```
+
+## Row {height="10%"}
+
+::: {.card}
+:::{.section-dark}
+[Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
+
+[HackODS UNAM 2026 · Ir a Datos](#datos){.footer-text-secondary}
+:::
+:::
+
+# Datos
+
+## Row {height="20%"}
+
+::: {.card}
+### Proceso de Limpieza y Curación
+Para garantizar la integridad del análisis, se realizaron los siguientes pasos de limpieza en las fuentes originales (ENOE, ENUT y Datos Abiertos CDMX):
+
+1. **Filtrado Geográfico:** Se segmentaron únicamente los registros correspondientes a la Ciudad de México y zonas conurbadas.
+2. **Tratamiento de Atípicos:** En los ingresos por hora, se aplicó un filtro de percentiles ($P_{05}$ a $P_{95}$) para eliminar ruido estadístico de valores extremos o errores de captura.
+3. **Estandarización:** Se homologaron los nombres de las alcaldías y se categorizaron las ocupaciones bajo la metodología del INEGI para sector Formal e Informal.
+4. **Georeferenciación:** Se integraron coordenadas manuales a las estaciones del Metro con mayor afluencia para su visualización espacial.
+:::
+
+## Row {.tabset}
+
+### ENOE (Ocupación e Ingresos)
+**Fuente:** [INEGI - Encuesta Nacional de Ocupación y Empleo (2024)](https://www.inegi.org.mx/programas/enoe/15ymas/)
+
+```{python}
+#| title: "Preview: enoe_cdmx_limpio.csv"
+from itables import show
+# Mostramos las primeras 10 filas de forma elegante
+show(df.head(10), classes="display nowrap compact", paging=False, searching=False)
+```
+
+
+### Metro CDMX (Movilidad y Afluencia)
+**Fuente:** [Portal de Datos Abiertos de la CDMX](https://datos.cdmx.gob.mx/)
+```{python}
+#| title: "Preview: metro_limpio.csv"
+show(df_metro.head(10), classes="display nowrap compact", paging=False, searching=False)
+```
+
+### ENUT (Uso del Tiempo)
+**Fuente:** [INEGI - Encuesta Nacional sobre Uso del Tiempo](https://www.inegi.org.mx/programas/enut/2024/)
+```{python}
+#| title: "Preview: enut_cdmx_resumen.csv"
+enut_preview = pd.read_csv('../datos/enut_cdmx_resumen.csv')
+show(enut_preview.head(10), classes="display nowrap compact", paging=False, searching=False)
+```
+
+## Row {height="10%"}
+
+::: {.card}
+:::{.section-dark}
+[Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
+
+[HackODS UNAM 2026 · Ir a Datos](#datos){.footer-text-secondary}
+:::
+:::
