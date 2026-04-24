@@ -2,6 +2,16 @@
 
 > *No lo decimos nosotros. Lo dicen los datos del propio gobierno.*
 
+## Resumen
+
+Tablero de datos para analizar la brecha laboral en la Ciudad de México con foco en:
+
+- **Ingresos** entre sector formal e informal
+- **Uso del tiempo** y traslados según condición laboral y género
+- **Movilidad** y concentración de afluencia en el Metro CDMX
+
+El tablero principal vive en `dashboard/index.qmd` y el sitio publicado se genera en `docs/`.
+
 ---
 
 ## Equipo
@@ -37,6 +47,14 @@ Utilizando datos oficiales de la Encuesta Nacional de Ocupación y Empleo (ENOE 
 
 ---
 
+## Estructura del proyecto
+
+- `dashboard/index.qmd`: tablero principal del proyecto.
+- `dashboard/tablero.qmd`: borrador / versión alternativa del dashboard.
+- `datos/`: archivos fuente y salidas procesadas.
+- `scripts/`: limpieza, análisis y generación de resultados.
+- `docs/`: HTML renderizado para publicación.
+
 ##  Fuentes de datos
 
 | Fuente | Dataset | Portal |
@@ -49,27 +67,66 @@ Utilizando datos oficiales de la Encuesta Nacional de Ocupación y Empleo (ENOE 
 
 **Requisitos:**
 - Python 3.10+
+- `uv`
 - Quarto ([quarto.org](https://quarto.org/docs/get-started/))
 
-**Instalar dependencias:**
+**Crear el entorno con `uv`:**
 ```bash
-pip install pandas plotly statsmodels jupyter
+uv venv
+source .venv/bin/activate
 ```
 
-**Correr los scripts de limpieza:**
+**Instalar dependencias del proyecto:**
 ```bash
-python scripts/01_limpieza.py
-python scripts/03_enut.py
+uv sync
 ```
 
-**Lanzar el dashboard:**
+**Instalar Quarto si hace falta:**
+```bash
+quarto --version
+```
+
+**Correr los scripts de preparación de datos:**
+```bash
+uv run python scripts/01_limpieza.py
+uv run python scripts/03_enut.py
+uv run python scripts/04_limpieza_metro.py
+uv run python scripts/05_analisis_metro.py
+```
+
+**Alternativa sin activar el entorno:**
+```bash
+uv run python scripts/01_limpieza.py
+uv run quarto render dashboard/index.qmd
+```
+
+**Renderizar el dashboard principal:**
+```bash
+uv run quarto render dashboard/index.qmd
+```
+
+**Previsualizar en local:**
 ```bash
 cd dashboard
-quarto preview tablero.qmd
+uv run quarto preview index.qmd
 ```
 
+> Nota: el render genera el sitio en `docs/` según la configuración de `dashboard/_quarto.yml`.
+
 ---
+
+## Archivos de salida
+
+- `datos/enoe_cdmx_limpio.csv`
+- `datos/enut_cdmx_resumen.csv`
+- `datos/metro_limpio.csv`
+- `datos/resultados_analisis_metro/*.csv`
+- `docs/index.html`
 
 ## Licencia 
 
 Este proyecto está bajo la licencia **CC BY-SA 4.0**. Consulta el archivo [LICENSE](./LICENSE) para ver el texto legal completo.
+
+## Declaración de IA
+
+El repositorio incluye `DECLARATORIA_IA.md` para documentar el uso de herramientas de IA durante el desarrollo.
