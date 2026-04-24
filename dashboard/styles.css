@@ -14,8 +14,28 @@
   --gray-light: #64748B;
 }
 
-/* ─────────────────────────────────────────────────────
-   SECCIÓN HERO (INTRO)
+/* ─────────────────────────────────────────────────────   VALUEBOXES - ESTILOS
+   ───────────────────────────────────────────────────── */
+
+.valuebox {
+  font-size: 0.75rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.valuebox-title {
+  font-size: 0.7rem !important;
+}
+
+.valuebox-value {
+  font-size: 1.3rem !important;
+}
+
+/* Espacio entre row de valueboxes y gráfica siguiente */
+.dashboard-row:has(.valuebox) {
+  margin-bottom: 3rem !important;
+}
+
+/* ─────────────────────────────────────────────────────   SECCIÓN HERO (INTRO)
    ───────────────────────────────────────────────────── */
 
 .hero-section {

@@ -7,32 +7,6 @@ format:
     scrolling: true
 ---
 
-<style>
-/* Tarjetas Valueboxes - Texto más pequeño */
-.valuebox {
-  font-size: 0.75rem !important;
-}
-
-.valuebox-title {
-  font-size: 0.7rem !important;
-}
-
-.valuebox-value {
-  font-size: 1.3rem !important;
-}
-
-/* Espacio entre valueboxes */
-.valuebox {
-  margin-bottom: 2rem !important;
-}
-
-/* Espacio entre row de valueboxes y gráfica siguiente */
-.dashboard-row:has(.valuebox) {
-  margin-bottom: 3rem !important;
-
-}
-</style>
-
 ```{python}
 #| output: false
 import pandas as pd
@@ -65,7 +39,7 @@ porcentaje_diferencia = (diferencia / ingreso_formal * 100)
 :::{.hero-title}
 Mi tiempo no esta en mis manos,
 
-[esta en un vagón.]{.hero-accent}
+[está en un vagón.]{.hero-accent}
 :::
 
 :::
@@ -271,6 +245,9 @@ Los datos no tienen ideología — pero sí tienen consecuencias.]{.hero-text}
 Pero sí pretende hacer más difícil mirar para otro lado.**]{.hero-highlight}
 
 :::
+
+### grafica 
+aaaaaaa
 
 ## Footer
 

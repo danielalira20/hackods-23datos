@@ -1,6 +1,4 @@
 ---
-title: "Formal vs Informal - CDMX"
-subtitle: "Análisis de la brecha de ingresos en la Ciudad de México"
 format:
   dashboard:
     orientation: rows
