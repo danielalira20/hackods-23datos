@@ -7,32 +7,6 @@ format:
     scrolling: true
 ---
 
-<style>
-/* Tarjetas Valueboxes - Texto más pequeño */
-.valuebox {
-  font-size: 0.75rem !important;
-}
-
-.valuebox-title {
-  font-size: 0.7rem !important;
-}
-
-.valuebox-value {
-  font-size: 1.3rem !important;
-}
-
-/* Espacio entre valueboxes */
-.valuebox {
-  margin-bottom: 2rem !important;
-}
-
-/* Espacio entre row de valueboxes y gráfica siguiente */
-.dashboard-row:has(.valuebox) {
-  margin-bottom: 3rem !important;
-
-}
-</style>
-
 ```{python}
 #| output: false
 import pandas as pd
@@ -60,12 +34,12 @@ porcentaje_diferencia = (diferencia / ingreso_formal * 100)
 
 :::{.hero-container}
 
-[ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2025]{.section-label}
+[ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2026]{.section-label}
 
 :::{.hero-title}
 Mi tiempo no esta en mis manos,
 
-[esta en un vagón.]{.hero-accent}
+[está en un vagón.]{.hero-accent}
 :::
 
 :::
@@ -130,8 +104,6 @@ dict(icon="hourglass-split", color="warning", value="3.5 día")
 dict(icon="people-fill", color="success", value=f"195")
 ```
 ## Row {height="30%"}
-
-
 
 
 ```{python}
@@ -213,6 +185,9 @@ def crear_mapa():
 crear_mapa()
 ```
 
+## 
+[**[Leer el análisis →](./#metro)**]{.cta-button}
+
 :::
 
 :::
@@ -221,65 +196,130 @@ crear_mapa()
 
 ### Contexto
 
-[Hay una Ciudad de México que no aparece en los anuncios de inversión.
-No está en los reportes del PIB. No sale en las portadas.
-Pero existe — y la sostienen millones de personas
-que se levantan antes del amanecer, cruzan la ciudad de punta a punta,
-trabajan todo el día, y aun así vuelven a casa con menos
-de lo que necesitan para vivir con dignidad.]{.hero-text}
+[En la Ciudad de México, dos personas pueden trabajar el mismo número de horas — y llevarse a casa ingresos radicalmente distintos dependiendo de si su empleo es formal o informal.]{.hero-text}
 
-[Esto no es mala suerte. No es falta de esfuerzo.
-**Es el resultado medible, cuantificable, de un sistema que trata el trabajo decente como privilegio — no como derecho.**]{.hero-highlight}
+[La diferencia no es de esfuerzo. Es estructural.]{.hero-text}
 
-[**[Leer el análisis →](./#Contexto)**]{.cta-button}
+[Un trabajador formal gana en mediana *$70 por hora. Uno informal, *$50**. Son $20 pesos por hora que, multiplicados por años de carrera, representan una brecha que el sistema laboral no corrige por sí solo.]{.hero-text}
+
+
+[**6 de cada 10 trabajadores en la CDMX están del lado informal de esa línea.**]{.hero-highlight}
+
+[**[Leer el análisis →](./#sector)**]{.cta-button}
 
 
 ### Gráfica
+
 ```{python}
-#| title: "Tu gráfica aquí"
-# Reemplaza esto con tu código de gráfica
+#| title: "El informal gana menos por hora — trabajador típico"
+p05 = df['ingreso_por_hora'].quantile(0.05)
+p95 = df['ingreso_por_hora'].quantile(0.95)
+df_tipico = df[(df['ingreso_por_hora'] >= p05) & (df['ingreso_por_hora'] <= p95)]
 
-import plotly.express as px
+mediana_formal   = df_tipico[df_tipico['sector']=='Formal']['ingreso_por_hora'].median()
+mediana_informal = df_tipico[df_tipico['sector']=='Informal']['ingreso_por_hora'].median()
 
-fig = px.bar(x=['A', 'B', 'C'], y=[1, 3, 2])
-fig.show()
+px.box(
+    df_tipico,
+    x='sector',
+    y='ingreso_por_hora',
+    color='sector',
+    color_discrete_map={'Formal': '#1D9E75', 'Informal': '#BA7517'},
+    points='all',
+    labels={
+        'sector': '',
+        'ingreso_por_hora': 'Ingreso por hora (MXN)'
+    }
+).update_layout(
+    showlegend=False,
+    height=420,
+    annotations=[
+        dict(x='Formal',   y=mediana_formal,   text=f'Mediana: ${mediana_formal:.0f}/hr',
+             xshift=90, showarrow=False, font=dict(color='#1D9E75', size=12)),
+        dict(x='Informal', y=mediana_informal, text=f'Mediana: ${mediana_informal:.0f}/hr',
+             xshift=90, showarrow=False, font=dict(color='#BA7517', size=12))
+    ]
+)
+```
+
+## importancia
+
+
+
+### grafica 
+```{python}
+#| title: "El traslado le cuesta más al que menos gana"
+
+enut = pd.read_csv('../datos/enut_cdmx_resumen.csv')
+horas_traslado_anio = enut[enut['condicion'] == 'Ocupada/o']['traslado'].values[0] * 52
+
+resumen_sector = df.groupby('sector').agg(
+    ingreso_hora=('ingreso_por_hora', 'median'),
+    ingreso_mensual=('ingreso_mensual', 'mean'),
+    horas_semana=('horas_semana', 'mean')
+).round(2)
+
+df_tiempo = pd.DataFrame([
+    {
+        'Métrica': 'Semanas de trabajo\nperdidas en traslado',
+        'Sector': sector,
+        'Valor': round(horas_traslado_anio / resumen_sector.loc[sector, 'horas_semana'], 1)
+    }
+    for sector in ['Formal', 'Informal']
+] 
+  )
+
+px.bar(
+    df_tiempo,
+    x='Sector', y='Valor',
+    color='Sector',
+    color_discrete_map={'Formal': '#1D9E75', 'Informal': '#BA7517'},
+    facet_col='Métrica',
+    text='Valor',
+    labels={'Valor': '', 'Sector': ''}
+).update_traces(
+    texttemplate='%{text:.1f}', textposition='outside'
+).update_layout(
+    height=420,
+    showlegend=False,
+    margin=dict(t=60, b=40)
+).update_yaxes(
+    matches=None, visible=False, range=[0, None]
+).for_each_annotation(
+    lambda a: a.update(text=a.text.split('=')[-1])
+)
 ```
 
 
-## Por qué esto importa
-
-:::{.section-container-sm}
-
-[POR QUÉ ESTO IMPORTA]{.section-label}
-
 ### El ODS 8 no es un ideal. Es un compromiso.
 
+
+[El impuesto del tiempo.
+El costo de la informalidad no solo se mide en pesos, sino en la moneda más escasa para quien vive al día: el tiempo.]{.hero-text}
+
+[En la Ciudad de México, el sistema de transporte y la mancha urbana imponen una "cuota" de traslado similar para todos, pero el peso de esa cuota es regresivo. Para el trabajador informal, las horas perdidas en el tráfico no son solo cansancio; representan una porción mucho más agresiva de su valor generado.]{.hero-text}
+
+[Mientras que un trabajador formal ve consumirse una parte de su ingreso anual en el trayecto, para el informal el impacto es proporcionalmente mayor.]{.hero-text}
+
+[**El sistema no solo les paga menos por hora, sino que les cobra más caro el derecho a llegar a su trabajo.**]{.hero-highlight}
+
+[**[Leer el análisis →](./#sector)**]{.cta-button}
+
+
+## Conclusión
 :::{.section-title-large}
 "Promover el crecimiento económico sostenido, inclusivo y sostenible, el empleo pleno y productivo y el **trabajo decente para todas las personas**."
 — Agenda 2030, ODS 8
 :::
-
-[México firmó ese compromiso. La CDMX lo repite en sus planes de desarrollo.
-Y sin embargo, los datos de 2025 muestran que para más de la mitad de su fuerza laboral,
-el "trabajo decente" sigue siendo una aspiración — no una realidad.]{.hero-text}
-
-[No lo decimos nosotros. Lo dicen la ENOE, la ENUT y el sistema de afluencia del Metro.
-Fuentes del propio gobierno federal, del propio INEGI.
-Los datos no tienen ideología — pero sí tienen consecuencias.]{.hero-text}
-
-[**Este análisis no pretende tener todas las respuestas.
-Pero sí pretende hacer más difícil mirar para otro lado.**]{.hero-highlight}
-
-:::
-
 ## Footer
 
 :::{.section-dark}
 
 [Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
 
-[Hecho con datos — y con coraje. · HackODS UNAM 2026]{.footer-text-secondary}
+[HackODS UNAM 2026]{.footer-text-secondary}
 
 :::
+
 
 {{< include tablero.qmd >}}
