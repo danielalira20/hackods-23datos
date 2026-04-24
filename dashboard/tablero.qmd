@@ -5,6 +5,7 @@ format:
   dashboard:
     orientation: rows
     scrolling: true
+
 ---
 
 ```{python}
@@ -58,64 +59,94 @@ dict(icon="percent", color="info", value=f"{porcentaje_diferencia:.0f}%")
 
 ## Row {height="35%"}
 
-```{python}
-#| title: "Ingreso mensual promedio (MXN)"
-fig1 = px.bar(
-    resumen, x='sector', y='ingreso',
-    color='sector',
-    color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
-    text='ingreso'
-).update_traces(
-    texttemplate='$%{text:,.0f}', textposition='outside'
-).update_layout(
-    showlegend=False,
-    yaxis_title='Ingreso (MXN)',
-    xaxis_title='',
-    yaxis_tickprefix='$',
-    yaxis_tickformat=',',
-    height=350
-)
-fig1.show()
-```
+
 
 
 
 ```{python}
-#| title: "Distribución de trabajadores"
-fig2 = px.bar(
-    resumen, x='sector', y='conteo',
+#| title: "El informal gana menos por hora — trabajador típico"
+p05 = df['ingreso_por_hora'].quantile(0.05)
+p95 = df['ingreso_por_hora'].quantile(0.95)
+df_tipico = df[(df['ingreso_por_hora'] >= p05) & (df['ingreso_por_hora'] <= p95)]
+
+mediana_formal   = df_tipico[df_tipico['sector']=='Formal']['ingreso_por_hora'].median()
+mediana_informal = df_tipico[df_tipico['sector']=='Informal']['ingreso_por_hora'].median()
+
+px.box(
+    df_tipico,
+    x='sector',
+    y='ingreso_por_hora',
     color='sector',
-    color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
-    text='conteo'
-).update_traces(
-    texttemplate='%{text:,.0f}', textposition='outside'
+    color_discrete_map={'Formal': '#1D9E75', 'Informal': '#BA7517'},
+    points='all',
+    labels={
+        'sector': '',
+        'ingreso_por_hora': 'Ingreso por hora (MXN)'
+    }
 ).update_layout(
     showlegend=False,
-    yaxis_title='Cantidad',
-    xaxis_title='',
-    height=350
+    height=420,
+    annotations=[
+        dict(x='Formal',   y=mediana_formal,   text=f'Mediana: ${mediana_formal:.0f}/hr',
+             xshift=90, showarrow=False, font=dict(color='#1D9E75', size=12)),
+        dict(x='Informal', y=mediana_informal, text=f'Mediana: ${mediana_informal:.0f}/hr',
+             xshift=90, showarrow=False, font=dict(color='#BA7517', size=12))
+    ]
 )
-fig2.show()
 ```
 
 ## Row {height="40%"}
 
 ```{python}
-#| title: "Horas trabajadas vs Ingreso por hora"
-fig3 = px.scatter(
-    df,
-    x='horas_semana', y='ingreso_por_hora',
-    color='sector',
-    color_discrete_map={'Formal': '#14B8A6', 'Informal': '#F59E0B'},
-    opacity=0.5,
-    trendline='ols'
+#| title: "El traslado le cuesta más al que menos gana"
+
+enut = pd.read_csv('../datos/enut_cdmx_resumen.csv')
+horas_traslado_anio = enut[enut['condicion'] == 'Ocupada/o']['traslado'].values[0] * 52
+
+resumen_sector = df.groupby('sector').agg(
+    ingreso_hora=('ingreso_por_hora', 'median'),
+    ingreso_mensual=('ingreso_mensual', 'mean'),
+    horas_semana=('horas_semana', 'mean')
+).round(2)
+
+df_tiempo = pd.DataFrame([
+    {
+        'Métrica': 'Semanas de trabajo\nperdidas en traslado',
+        'Sector': sector,
+        'Valor': round(horas_traslado_anio / resumen_sector.loc[sector, 'horas_semana'], 1)
+    }
+    for sector in ['Formal', 'Informal']
+] + [
+    {
+        'Métrica': '% del ingreso anual\nconsumido por el traslado',
+        'Sector': sector,
+        'Valor': round(
+            (horas_traslado_anio * resumen_sector.loc[sector, 'ingreso_hora']) /
+            (resumen_sector.loc[sector, 'ingreso_mensual'] * 12) * 100, 1
+        )
+    }
+    for sector in ['Formal', 'Informal']
+])
+
+px.bar(
+    df_tiempo,
+    x='Sector', y='Valor',
+    color='Sector',
+    color_discrete_map={'Formal': '#1D9E75', 'Informal': '#BA7517'},
+    facet_col='Métrica',
+    text='Valor',
+    labels={'Valor': '', 'Sector': ''}
+).update_traces(
+    texttemplate='%{text:.1f}', textposition='outside'
 ).update_layout(
-    xaxis_title='Horas por semana',
-    yaxis_title='Ingreso por hora (MXN)',
-    showlegend=True,
-    height=450
+    height=420,
+    showlegend=False,
+    margin=dict(t=60, b=40)
+).update_yaxes(
+    matches=None, visible=False, range=[0, None]
+).for_each_annotation(
+    lambda a: a.update(text=a.text.split('=')[-1])
 )
-fig3.show()
 ```
 
 # Ocupacion y genero
@@ -388,24 +419,26 @@ crear_mapa()
 #| title: "Viajes desde el Estado de México — Estaciones en territorio Edomex"
 edomex = pd.read_csv('../datos/resultados_analisis_metro/03_estaciones_edomex.csv')
 edomex = edomex.sort_values('promedio_diario')
- 
-fig_edomex = px.bar(
+edomex['etiqueta'] = edomex['linea'] + ' — ' + edomex['promedio_diario'].apply(lambda x: f'{x:,}')
+
+px.bar(
     edomex,
     x='promedio_diario', y='estacion',
     orientation='h',
     color='linea',
-    text='promedio_diario'
+    text='etiqueta',
+    labels={
+        'promedio_diario': 'Promedio de viajes diarios',
+        'estacion': '',
+        'linea': 'Línea'
+    }
 ).update_traces(
-    texttemplate='%{text:,} viajes/día', textposition='outside'
+    textposition='outside'
 ).update_layout(
-    showlegend=True,
-    xaxis_title='Promedio de viajes diarios',
-    yaxis_title='',
+    showlegend=False,
     height=420,
-    #legend_title='Línea',
-    legend=dict(orientation='h', y=-0.25, x=0.5, xanchor='center')
+    margin=dict(r=200)
 )
-fig_edomex
 ```
 
 ## Row {height="30%"}
@@ -424,6 +457,7 @@ fig10 = px.bar(
     x='dia_nombre', y='afluencia_miles',
     text='afluencia_miles'
 ).update_traces(
+    marker_color='#F59E0B',
     texttemplate='%{text:.0f}K', textposition='outside'
 ).update_layout(
     showlegend=False,
