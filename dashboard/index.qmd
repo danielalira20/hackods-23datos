@@ -80,7 +80,7 @@ afluencia_anio_mayor = df_metro[df_metro['fecha'].dt.year == anio_mayor]["afluen
 
 #| content: valuebox
 #| title: "En traslado por día"
-dict(icon="train", color="info", value="5.5 hrs")
+dict(icon="train-front", color="info", value="5.5 hrs")
 ```
 
 ```{python}
@@ -101,7 +101,7 @@ dict(icon="hourglass-split", color="warning", value="3.5 día")
 ```{python}
 #| content: valuebox
 #| title: "Afluencia"
-dict(icon="people-fill", color="success", value=f"195")
+dict(icon="graph-up", color="success", value="3.84 M")
 ```
 ## Row {height="30%"}
 
@@ -311,14 +311,14 @@ El costo de la informalidad no solo se mide en pesos, sino en la moneda más esc
 "Promover el crecimiento económico sostenido, inclusivo y sostenible, el empleo pleno y productivo y el **trabajo decente para todas las personas**."
 — Agenda 2030, ODS 8
 :::
-## Footer
+## row {height="10%"}
 
+::: {.card}
 :::{.section-dark}
-
 [Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
 
-[HackODS UNAM 2026]{.footer-text-secondary}
-
+[HackODS UNAM 2026 · Ir a Datos](#datos){.footer-text-secondary}
+:::
 :::
 
 
