@@ -184,6 +184,10 @@ def crear_mapa():
 
 crear_mapa()
 ```
+##
+:::{.section-title-large}
+Vivir en los bordes cuesta 5.5 horas al día: donde el suelo es más accesible pero el tiempo de traslado se convierte en un costo invisible que ningún recibo de nómina refleja.
+:::
 
 ## 
 [**[Leer el análisis →](./#metro)**]{.cta-button}
@@ -305,6 +309,70 @@ El costo de la informalidad no solo se mide en pesos, sino en la moneda más esc
 
 [**[Leer el análisis →](./#sector)**]{.cta-button}
 
+## Historia 
+
+### Contexto
+
+[Mientras el hombre domina el trayecto largo y pendular, la mujer navega una ciudad que fragmenta su tiempo entre el empleo y el cuidado. Esta brecha no es solo de distancia;]{.hero-text}
+[**es el reflejo de una ciudad que aún no reparte equitativamente las cargas del hogar**]{.hero-highlight}
+
+[**[Leer el análisis →](./#ocupacion-y-genero)**]{.cta-button}
+
+
+### Gráfica
+```{python}
+#| output: false
+act  = pd.read_csv('../datos/tvar_crea.csv', low_memory=False)
+cdmx = act[act['CVE_ENT'] == 9].copy()
+cdmx['sexo'] = cdmx['SEXO'].map({1: 'Hombre', 2: 'Mujer'})
+cdmx['condicion'] = cdmx['COND_AEE'].map({
+    1: 'Ocupada/o',
+    2: 'Con vínculo laboral',
+    3: 'Desocupada/o',
+    4: 'Estudiante',
+    5: 'Quehaceres del hogar',
+    6: 'Otro inactivo'
+})
+
+# Calcular métricas de género y ocupación
+total_mujeres = len(cdmx[cdmx['sexo'] == 'Mujer'])
+total_hombres = len(cdmx[cdmx['sexo'] == 'Hombre'])
+
+mujeres_ocupadas = len(cdmx[(cdmx['sexo'] == 'Mujer') & (cdmx['condicion'] == 'Ocupada/o')])
+hombres_ocupados = len(cdmx[(cdmx['sexo'] == 'Hombre') & (cdmx['condicion'] == 'Ocupada/o')])
+
+pct_mujeres_ocupadas = (mujeres_ocupadas / total_mujeres * 100) if total_mujeres > 0 else 0
+pct_hombres_ocupados = (hombres_ocupados / total_hombres * 100) if total_hombres > 0 else 0
+
+brecha_participacion = pct_hombres_ocupados - pct_mujeres_ocupadas
+
+# Horas de trabajo
+horas_mujeres = cdmx[cdmx['sexo'] == 'Mujer']['ACTIV_MERC'].mean() if total_mujeres > 0 else 0
+horas_hombres = cdmx[cdmx['sexo'] == 'Hombre']['ACTIV_MERC'].mean() if total_hombres > 0 else 0
+diferencia_horas = horas_hombres - horas_mujeres
+```
+```{python}
+#| title: "Horas semanales de traslado al trabajo por sexo"
+traslado_sexo = cdmx.groupby('sexo')['TRAS_TRAB'].mean().reset_index()
+traslado_sexo.columns = ['Sexo', 'Horas_traslado']
+traslado_sexo['Horas_traslado'] = traslado_sexo['Horas_traslado'].round(2)
+
+fig4 = px.bar(
+    traslado_sexo,
+    x='Sexo', y='Horas_traslado',
+    color='Sexo',
+    color_discrete_map={'Hombre': '#3B82F6', 'Mujer': '#EC4899'},
+    text='Horas_traslado'
+).update_traces(
+    texttemplate='%{text} hrs', textposition='outside'
+).update_layout(
+    showlegend=False,
+    yaxis_title='Horas por semana',
+    xaxis_title='',
+    height=250
+)
+fig4.show()
+```
 
 ## Conclusión
 :::{.section-title-large}

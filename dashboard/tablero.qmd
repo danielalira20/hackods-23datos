@@ -29,6 +29,20 @@ porcentaje_diferencia = (diferencia / ingreso_formal * 100)
 ```
 
 # Sector
+:::{.hero-section}
+
+:::{.hero-container}
+
+[ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2026]{.section-label}
+
+:::{.hero-title}
+Sector Formal vs Informal: 
+
+[el costo no se mide sólo en pesos ]{.hero-accent}
+:::
+
+:::
+:::
 
 ## Row
 
@@ -170,6 +184,21 @@ px.bar(
 
 # Ocupacion y genero
 
+:::{.hero-section}
+
+:::{.hero-container}
+
+[ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2026]{.section-label}
+
+:::{.hero-title}
+Movilidad y género:
+
+[el tiempo no es neutral. ]{.hero-accent}
+:::
+
+:::
+:::
+
 ## Row
 
 ```{python}
@@ -253,31 +282,13 @@ fig4 = px.bar(
 fig4.show()
 ```
 
+:::{.section-title-large}
 
+Los datos muestran que, en promedio, los hombres dedican más horas semanales al traslado exclusivo hacia el lugar de trabajo. Sin embargo, esta cifra es solo una pieza del rompecabezas: la movilidad masculina suele ser pendular (del hogar al trabajo y de regreso), mientras que la movilidad femenina está condicionada por las labores de cuidado y las brechas de participación laboral.
 
-```{python}
-#| title: "Tiempo libre semanal por condición de actividad"
-tlibre = cdmx.groupby('condicion')['ACTIV_CONVIV'].mean().reset_index()
-tlibre.columns = ['Condicion', 'Tiempo_libre']
-tlibre = tlibre.sort_values('Tiempo_libre')
+Para las mujeres, el tiempo en el transporte a menudo se fragmenta en paradas intermedias relacionadas con el hogar, lo que reduce su tiempo libre disponible sin que necesariamente se refleje como "traslado laboral" puro. La brecha en estas barras no es solo de tiempo, es un reflejo de cómo se distribuyen las responsabilidades en la ciudad.
+:::
 
-fig5 = px.bar(
-    tlibre,
-    x='Tiempo_libre', y='Condicion',
-    orientation='h',
-    color='Tiempo_libre',
-    color_continuous_scale='Teal',
-    text='Tiempo_libre'
-).update_traces(
-    texttemplate='%{text:.1f} hrs', textposition='outside'
-).update_layout(
-    coloraxis_showscale=False,
-    xaxis_title='Horas de convivencia/semana',
-    yaxis_title='',
-    height=300
-)
-fig5.show()
-```
 
 ## Row {height="35%"}
 
@@ -318,7 +329,20 @@ fig6.show()
 :::
 
 # Metro
+:::{.hero-section}
 
+:::{.hero-container}
+
+[ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2026]{.section-label}
+
+:::{.hero-title}
+El costo de vivir 
+
+[en la periferia.]{.hero-accent}
+:::
+
+:::
+:::
 ## Row 
 
 ```{python}
@@ -436,12 +460,9 @@ crear_mapa()
 ## row
 :::{.section-title-large}
 
-Los nudos del sistema: Donde la ciudad converge y colapsa.
-El mapa no solo muestra estaciones de metro; dibuja las venas abiertas de la movilidad en la CDMX. La concentración masiva de afluencia en terminales como Pantitlán, Indios Verdes y Cuatro Caminos confirma que el sistema de transporte carga con el peso de millones que vienen de las periferias.
+Pantitlán, Indios Verdes, Cuatro Caminos, estas estaciones no son solo las más concurridas del Metro. Son el punto de llegada de miles de personas que cada mañana recorren entre 45 minutos y dos horas desde las periferias y municipios del Estado de México para llegar a trabajar.
 
-Estas 15 estaciones son los puntos donde el "impuesto del tiempo" se cobra con mayor rigor. Son espacios donde la infraestructura llega a su límite, obligando al trabajador —especialmente al informal, que carece de opciones de transporte privado— a navegar los nodos más saturados del mundo para poder generar un ingreso.
-
-La saturación no es un error de logística, es el síntoma geográfico de la brecha salarial.
+La distancia no es casualidad. Los datos muestran que la mayor afluencia se concentra precisamente en las terminales del norte y nororiente, las zonas más alejadas del centro económico de la ciudad, donde el suelo es más accesible pero el tiempo de traslado se convierte en un costo invisible que ningún recibo de nómina refleja.
 :::
 
 ## Row {height="30%"}
