@@ -20,17 +20,16 @@
 
 .hero-section {
   background: white;
-  min-height: 96vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6rem 2rem;
   font-family: 'Segoe UI', sans-serif;
   border-bottom: 4px solid var(--primary);
 }
 
 .hero-container {
-  max-width: 820px;
+  width: 100%;           /* Usa 100% del contenedor padre */
+  padding: 0 2rem;       /* Deja espacios en los lados */
   margin: 0 auto;
   text-align: center;
 }
@@ -52,6 +51,18 @@
   height: 4px;
   background: var(--primary);
   margin: 2rem auto;
+}
+
+/* ─────────────────────────────────────────────────────
+   FULL WIDTH ROW
+   ───────────────────────────────────────────────────── */
+
+.full-width-row {
+  width: 100%;
+  padding: 1rem 1rem 4rem 1rem;
+  background: white;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .hero-text {
@@ -263,8 +274,8 @@
 
 .card-text {
   color: var(--gray-text);
-  font-size: 0.93rem;
-  line-height: 1.8;
+  font-size: 0.8rem;
+  line-height: 1.6;
   display: block;
 }
 
@@ -293,10 +304,10 @@
 
 .card-label {
   color: var(--dark);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   display: block;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.6rem;
 }
 
 /* ─────────────────────────────────────────────────────

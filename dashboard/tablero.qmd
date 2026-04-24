@@ -374,6 +374,7 @@ def crear_mapa():
         column_widths=[0.62, 0.38],
         horizontal_spacing=0.03
     )
+
     fig.add_trace(go.Scattermapbox(
         lat=df_mapa['lat'], lon=df_mapa['lon'],
         mode='markers',
@@ -458,4 +459,3 @@ fig10 = px.bar(
 )
 fig10.show()
 ```
-
