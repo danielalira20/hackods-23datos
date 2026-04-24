@@ -251,7 +251,7 @@ fig.show()
 
 [POR QUÉ ESTO IMPORTA]{.section-label}
 
-## El ODS 8 no es un ideal. Es un compromiso.
+### El ODS 8 no es un ideal. Es un compromiso.
 
 :::{.section-title-large}
 "Promover el crecimiento económico sostenido, inclusivo y sostenible, el empleo pleno y productivo y el **trabajo decente para todas las personas**."
@@ -270,9 +270,10 @@ Los datos no tienen ideología — pero sí tienen consecuencias.]{.hero-text}
 Pero sí pretende hacer más difícil mirar para otro lado.**]{.hero-highlight}
 
 :::
+### grafica 
+grafica aqui
 
-
-
+## row
 :::{.section-dark}
 
 [Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
