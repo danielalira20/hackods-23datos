@@ -1,12 +1,59 @@
 ---
-title: "ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2025"
-subtitle: "Madrugan a las 5 AM. Regresan de noche. Y aún así, no alcanza."
+title: "ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO"
 lang: es
 format:
   dashboard:
     orientation: rows
     scrolling: true
 ---
+
+<style>
+/* Tarjetas Valueboxes - Texto más pequeño */
+.valuebox {
+  font-size: 0.75rem !important;
+}
+
+.valuebox-title {
+  font-size: 0.7rem !important;
+}
+
+.valuebox-value {
+  font-size: 1.3rem !important;
+}
+
+/* Espacio entre valueboxes */
+.valuebox {
+  margin-bottom: 2rem !important;
+}
+
+/* Espacio entre row de valueboxes y gráfica siguiente */
+.dashboard-row:has(.valuebox) {
+  margin-bottom: 3rem !important;
+
+}
+</style>
+
+```{python}
+#| output: false
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+df = pd.read_csv('../datos/enoe_cdmx_limpio.csv')
+
+resumen = df.groupby('sector').agg(
+    horas=('horas_semana', 'mean'),
+    ingreso=('ingreso_mensual', 'mean'),
+    pago_hora=('ingreso_por_hora', 'mean'),
+    conteo=('sector', 'count')
+).reset_index().round(1)
+
+ingreso_formal    = resumen[resumen['sector'] == 'Formal']['ingreso'].values[0]
+ingreso_informal  = resumen[resumen['sector'] == 'Informal']['ingreso'].values[0]
+diferencia        = ingreso_formal - ingreso_informal
+porcentaje_diferencia = (diferencia / ingreso_formal * 100)
+```
+
 # Home
 
 :::{.hero-section}
@@ -16,15 +63,160 @@ format:
 [ODS 8 · TRABAJO DECENTE Y CRECIMIENTO ECONÓMICO · CDMX 2025]{.section-label}
 
 :::{.hero-title}
-Madrugan a las 5 AM.
+Mi tiempo no esta en mis manos,
 
-Regresan de noche.
-
-[Y aún así, no alcanza.]{.hero-accent}
+[esta en un vagón.]{.hero-accent}
 :::
 
-:::{.divider}
 :::
+
+:::{.full-width-row}
+
+## Row 
+
+```{python}
+#| output: false
+ZONA_NORTE = ["Gustavo A. Madero", "Azcapotzalco", "Venustiano Carranza", "Estado de México", "Nezahualcóyotl (Edomex)"]
+ZONA_SUR   = ["Coyoacán", "Álvaro Obregón", "Magdalena Contreras", "Tláhuac", "Xochimilco"]
+
+df_metro = pd.read_csv('../datos/metro_limpio.csv', parse_dates=["fecha"])
+df_metro["zona"] = df_metro["alcaldia"].apply(
+    lambda a: "Norte/Nororiente" if a in ZONA_NORTE else ("Sur/Poniente" if a in ZONA_SUR else "Centro")
+)
+df_metro["dia_semana"] = df_metro["fecha"].dt.dayofweek
+df_metro["dia_nombre"] = df_metro["dia_semana"].map({0:"Lun",1:"Mar",2:"Mié",3:"Jue",4:"Vie",5:"Sáb",6:"Dom"})
+
+# Calcular métricas del Metro
+total_viajes = df_metro["afluencia"].sum()
+total_viajes_millones = total_viajes / 1_000_000
+
+afluencia_promedio_diaria = df_metro.groupby("fecha")["afluencia"].sum().mean()
+afluencia_promedio_millones = afluencia_promedio_diaria / 1_000_000
+
+# Zona con más afluencia
+afluencia_por_zona = df_metro.groupby("zona")["afluencia"].sum()
+zona_mayor = afluencia_por_zona.idxmax()
+
+# Año con mayor afluencia
+anio_mayor = df_metro['fecha'].dt.year.max()
+afluencia_anio_mayor = df_metro[df_metro['fecha'].dt.year == anio_mayor]["afluencia"].sum() / 1_000_000
+```
+
+```{python}
+
+#| content: valuebox
+#| title: "En traslado por día"
+dict(icon="train", color="info", value="5.5 hrs")
+```
+
+```{python}
+#| content: valuebox
+#| title: "Zona crítica"
+dict(icon="geo-alt", color="danger", value="Norte")
+```
+
+
+
+```{python}
+#| content: valuebox
+#| title: "Tiempo libre en hrs"
+dict(icon="hourglass-split", color="warning", value="3.5 día")
+```
+
+
+```{python}
+#| content: valuebox
+#| title: "Afluencia"
+dict(icon="people-fill", color="success", value=f"195")
+```
+## Row {height="30%"}
+
+
+
+
+```{python}
+#| title: "Mapa de Estaciones Críticas (Afluencia Acumulada)"
+from plotly.subplots import make_subplots
+
+def crear_mapa():
+    top_est = df_metro.groupby(["estacion", "alcaldia"])["afluencia"].sum().reset_index()
+    top_est = top_est.sort_values("afluencia", ascending=False).head(15)
+    top_est["afluencia_millones"] = (top_est["afluencia"] / 1_000_000).round(2)
+
+    coords = {
+        'Indios Verdes': [19.4954, -99.1195], 'Cuatro Caminos': [19.4596, -99.2158],
+        'Constitución de 1917': [19.3460, -99.0639], 'Tasqueña': [19.3437, -99.1395],
+        'Pantitlán': [19.4151, -99.0743], 'Universidad': [19.3243, -99.1739],
+        'Zócalo/Tenochtitlan': [19.4325, -99.1322], 'Observatorio': [19.3982, -99.2004],
+        'Ciudad Azteca': [19.5341, -99.0272], 'Buenavista': [19.4468, -99.1531],
+        'Tacubaya': [19.4032, -99.1871], 'Chapultepec': [19.4204, -99.1763],
+        'Insurgentes': [19.4233, -99.1628], 'Zaragoza': [19.4121, -99.0823],
+        'Merced': [19.4255, -99.1245]
+    }
+
+    top_est['lat'] = top_est['estacion'].map(lambda x: coords.get(x, [None, None])[0])
+    top_est['lon'] = top_est['estacion'].map(lambda x: coords.get(x, [None, None])[1])
+    df_mapa = top_est.dropna(subset=['lat']).copy()
+
+    colores = ['#E63946', '#457B9D', '#1D3557', '#A8DADC', '#F1FAEE', '#FFB703', '#FB8500', '#8E9AAF', '#CBC0D3', '#EFD3D7']
+    df_mapa["color"] = [colores[i % len(colores)] for i in range(len(df_mapa))]
+    marker_sizes = (df_mapa['afluencia_millones'] * 6).clip(lower=16, upper=44)
+
+    fig = make_subplots(
+        rows=1, cols=2,
+        specs=[[{"type": "scattermapbox"}, {"type": "table"}]],
+        column_widths=[0.62, 0.38],
+        horizontal_spacing=0.03
+    )
+
+    fig.add_trace(go.Densitymapbox(
+        lat=df_mapa['lat'],
+        lon=df_mapa['lon'],
+        z=df_mapa['afluencia_millones'],
+        radius=38,
+        opacity=0.55,
+        colorscale='YlOrRd',
+        hoverinfo='skip',
+        showscale=False
+    ), row=1, col=1)
+
+    fig.add_trace(go.Scattermapbox(
+        lat=df_mapa['lat'], lon=df_mapa['lon'],
+        mode='markers',
+        marker=dict(size=marker_sizes, sizemode='diameter', sizemin=12, color=df_mapa['color'], opacity=0.8),
+        customdata=df_mapa[['alcaldia', 'afluencia_millones']],
+        text=df_mapa['estacion'],
+        hovertemplate='<b>%{text}</b><br>Alcaldía: %{customdata[0]}<br>Afluencia: %{customdata[1]:.2f}M<extra></extra>',
+        showlegend=False
+    ), row=1, col=1)
+
+    fig.add_trace(go.Table(
+        header=dict(values=['', 'Estación', 'Alcaldía', 'Afluencia'],
+            fill_color='#F3F4F6', align=['center', 'left', 'left', 'right'],
+            font=dict(color='#111827', size=12), height=28),
+        cells=dict(
+            values=[[''] * len(df_mapa), df_mapa['estacion'], df_mapa['alcaldia'],
+                    [f"{v:.2f}M" for v in df_mapa['afluencia_millones']]],
+            fill_color=[df_mapa['color'], ['white']*len(df_mapa), ['white']*len(df_mapa), ['white']*len(df_mapa)],
+            align=['center', 'left', 'left', 'right'],
+            font=dict(color=['rgba(0,0,0,0)', '#111827', '#111827', '#111827'], size=11),
+            height=24),
+        columnwidth=[26, 140, 120, 70]
+    ), row=1, col=2)
+
+    fig.update_layout(
+        height=460, margin=dict(l=0, r=0, t=10, b=0),
+        mapbox=dict(style='carto-positron', zoom=10.3, center=dict(lat=19.4326, lon=-99.1332))
+    )
+    return fig
+
+crear_mapa()
+```
+
+
+## Historia 
+
+### Contexto
 
 [Hay una Ciudad de México que no aparece en los anuncios de inversión.
 No está en los reportes del PIB. No sale en las portadas.
@@ -38,122 +230,22 @@ de lo que necesitan para vivir con dignidad.]{.hero-text}
 
 [**[Leer el análisis →](./#Contexto)**]{.cta-button}
 
-:::
 
-:::
+### Gráfica
+```{python}
+#| title: "Tu gráfica aquí"
+# Reemplaza esto con tu código de gráfica
 
-:::{.section-warning}
+import plotly.express as px
 
-:::{.section-container}
+fig = px.bar(x=['A', 'B', 'C'], y=[1, 3, 2])
+fig.show()
+```
 
-:::{.section-title-warning}
-59 de cada 100 trabajadores
-de la CDMX están en la informalidad.
-:::
 
-[Más de la mitad. No son la excepción. Son la regla.]{.text-secondary}
+## Section2
 
-[Son el señor del puesto de tacos que conoces por su nombre.
-La señora que limpia oficinas antes de que amanezca.
-El repartidor que reconoces por su mochila naranja, no por el contrato que nunca le dieron.
-El albañil que construyó el edificio donde trabajas — y que no tiene seguro médico.]{.text-italic-secondary}
 
-:::
-
-:::
-
-:::{.section-light}
-
-:::{.section-container}
-
-[LO QUE LOS DATOS REVELAN]{.section-label-sm}
-
-## ¿Qué significa, en números reales, trabajar en la informalidad?
-
-[Los datos de la ENOE, la ENUT y el Metro CDMX no mienten.
-Aquí está lo que encontramos — y lo que cada cifra significa para una persona real.]{.section-intro}
-
-:::{.columns}
-
-:::{.column width="50%"}
-
-:::{.card-container .card-warning}
-
-[$6,973 MXN]{.card-number .warning}
-
-[**Menos al mes. Cada mes. Todos los meses.**]{.card-label}
-
-[Son $232 pesos menos por día que alguien en el sector formal haciendo el mismo esfuerzo.
-Es la diferencia entre tener acceso al IMSS o rezar para no enfermarte.
-Entre pagar la colegiatura de tus hijos o sacarlos de la escuela.
-Entre ahorrar para el retiro o trabajar hasta el último día.]{.card-text}
-
-:::
-
-:::
-
-:::{.column width="50%"}
-
-:::{.card-container .card-blue}
-
-[5.5 hrs/semana]{.card-number .blue}
-
-[**En traslado. Lo que los hombres pierden moviéndose por la ciudad.**]{.card-label}
-
-[Cinco horas y media cada semana dentro de un vagón del Metro.
-No son horas de trabajo — no se cuentan.
-No son horas de descanso — tampoco.
-Son horas en el limbo, pagadas de su propio tiempo,
-que nadie les va a devolver.]{.card-text}
-
-:::
-
-:::
-
-:::
-
-:::{.columns}
-
-:::{.column width="50%"}
-
-:::{.card-container .card-purple}
-
-[Norte]{.card-number .purple}
-
-[**La zona que más carga el Metro — y la que menos opciones tiene.**]{.card-label}
-
-[Gustavo A. Madero. Azcapotzalco. Venustiano Carranza.
-Son las alcaldías que más viajes generan en el sistema — porque sus habitantes tienen que recorrer más ciudad para llegar a donde está el trabajo.
-La geografía de la desigualdad tiene coordenadas precisas.]{.card-text}
-
-:::
-
-:::
-
-:::{.column width="50%"}
-
-:::{.card-container .card-teal}
-
-[24.3 hrs]{.card-number .teal}
-
-[**De tiempo libre por semana. El grupo que menos descansa de todos.**]{.card-label}
-
-[Menos de 3.5 horas libres al día.
-Tiempo para comer, para ver a tus hijos, para dormir bien, para ser persona fuera del trabajo.
-Las personas que trabajan tienen el menor tiempo libre de todos los grupos analizados —
-incluso menos que quienes están desocupados.]{.card-text}
-
-:::
-
-:::
-
-:::
-
-:::
-
-:::
-
-:::{style="background: white; padding: 6rem 2rem; font-family: 'Segoe UI', sans-serif;"}
 
 :::{.section-container-sm}
 
@@ -179,56 +271,7 @@ Pero sí pretende hacer más difícil mirar para otro lado.**]{.hero-highlight}
 
 :::
 
-:::
 
-:::{.section-light}
-
-:::{.section-container-lg}
-
-[EL RECORRIDO]{.section-label-sm}
-
-## La historia en tres actos
-
-[Cada sección del dashboard responde una pregunta distinta.
-Juntas, cuentan una sola historia.]{.section-intro}
-
-:::{.card-light .border-teal}
-
-[**Acto I — La brecha que duele en el bolsillo**]{.card-title}
-
-[¿Cuánto vale tu hora de trabajo según si tienes o no tienes contrato?
-Comparamos ingresos mensuales, pago por hora y horas trabajadas entre sector formal e informal.
-La respuesta es incómoda — y está en los datos.]{.card-text}
-
-:::
-
-:::{.card-light .border-warning}
-
-[**Acto II — El tiempo que nadie devuelve**]{.card-title}
-
-[¿Cuántas horas de tu vida se van en trasladarte, trabajar, y no tener tiempo para más?
-Cruzamos traslados, tiempo libre y condición laboral.
-Porque la desigualdad no solo se mide en pesos — se mide en horas robadas.]{.card-text}
-
-:::
-
-:::{.card-light .border-purple}
-
-[**Acto III — La ciudad que no es para todos por igual**]{.card-title}
-
-[¿Quiénes son los que más usan el Metro — y por qué?
-La afluencia por zona y por año traza el mapa de quién tiene que viajar más lejos
-para sostener una ciudad que muchas veces no les pertenece.]{.card-text}
-
-:::
-
-:::{.text-center}
-[**[Entrar al dashboard →](./#Contexto)**]{.cta-button}
-:::
-
-:::
-
-:::
 
 :::{.section-dark}
 
@@ -236,6 +279,7 @@ para sostener una ciudad que muchas veces no les pertenece.]{.card-text}
 
 [Hecho con datos — y con coraje. · HackODS UNAM 2026]{.footer-text-secondary}
 
+:::
 :::
 
 {{< include tablero.qmd >}}
