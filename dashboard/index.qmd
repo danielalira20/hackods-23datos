@@ -213,6 +213,9 @@ def crear_mapa():
 crear_mapa()
 ```
 
+:::
+
+:::
 
 ## Historia 
 
@@ -243,9 +246,7 @@ fig.show()
 ```
 
 
-## Section2
-
-
+## Por qué esto importa
 
 :::{.section-container-sm}
 
@@ -270,17 +271,15 @@ Los datos no tienen ideología — pero sí tienen consecuencias.]{.hero-text}
 Pero sí pretende hacer más difícil mirar para otro lado.**]{.hero-highlight}
 
 :::
-### grafica 
-grafica aqui
 
-## row
+## Footer
+
 :::{.section-dark}
 
 [Fuentes: ENOE T4 2025 · ENUT 2024 · Metro CDMX · INEGI]{.footer-text}
 
 [Hecho con datos — y con coraje. · HackODS UNAM 2026]{.footer-text-secondary}
 
-:::
 :::
 
 {{< include tablero.qmd >}}
